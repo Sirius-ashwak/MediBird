@@ -84,7 +84,7 @@ function Router() {
         <Route path="/welcome">
           <WelcomePage />
         </Route>
-        <Route path="/" exact>
+        <Route path="/">
           <WelcomePage />
         </Route>
         <Route path="*">

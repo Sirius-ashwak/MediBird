@@ -16,10 +16,13 @@ let connectionAttempted = false;
 
 // Polkadot network configuration
 const NETWORK_CONFIG = {
+  // Use a public Westend endpoint with fallback options if needed
   endpoint: process.env.POLKADOT_ENDPOINT || 'wss://westend-rpc.polkadot.io',
-  ss58Format: 42,  // Westend SS58 format
+  ss58Format: 42,  // Westend SS58 format (Polkadot testnet)
   chainName: 'Westend'
 };
+
+console.log(`Polkadot endpoint configured: ${NETWORK_CONFIG.endpoint}`);
 
 // Connect to the Polkadot network
 async function getPolkadotApi(): Promise<ApiPromise> {
@@ -130,15 +133,19 @@ class BlockchainService {
   private async initCrypto(): Promise<void> {
     try {
       // Wait for the cryptography to be ready
+      console.log('Initializing Polkadot cryptography...');
       await cryptoWaitReady();
       
       // Create a keyring with the correct SS58 format
       this.keyring = new Keyring({ type: 'sr25519', ss58Format: NETWORK_CONFIG.ss58Format });
       
-      console.log('Polkadot cryptography initialized');
+      console.log('Polkadot cryptography initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize Polkadot cryptography:', error);
+      const err = error as Error;
+      console.error('Failed to initialize Polkadot cryptography:', err.message);
+      console.error('Error details:', err.stack || 'No stack trace available');
       // Fall back to simulation if crypto initialization fails
+      this.keyring = null;
     }
   }
 
@@ -147,32 +154,52 @@ class BlockchainService {
    */
   async createWallet(): Promise<string> {
     try {
+      console.log('Starting Polkadot wallet creation process...');
+      
       // Ensure crypto is ready
       if (!this.keyring) {
+        console.log('Keyring not initialized yet, initializing crypto...');
         await this.initCrypto();
         if (!this.keyring) {
+          console.error('Keyring still not initialized after initialization attempt');
           throw new Error('Keyring not initialized');
         }
       }
       
+      console.log('Generating mnemonic...');
       // Generate a new mnemonic (seed phrase)
       const mnemonic = mnemonicGenerate();
       
+      console.log('Creating account from mnemonic...');
       // Create an account from the mnemonic
-      const account = this.keyring.addFromMnemonic(mnemonic);
-      const address = account.address;
-      
-      // Store wallet info
-      this.wallets.set(address, { 
-        privateKey: u8aToHex(mnemonicToMiniSecret(mnemonic)),
-        publicKey: u8aToHex(account.publicKey),
-        mnemonic
-      });
-      
-      console.log(`Created Polkadot wallet with address: ${address}`);
-      return address;
+      try {
+        const account = this.keyring.addFromMnemonic(mnemonic);
+        const address = account.address;
+        
+        console.log('Deriving keys from mnemonic...');
+        const miniSecret = mnemonicToMiniSecret(mnemonic);
+        const privateKey = u8aToHex(miniSecret);
+        const publicKey = u8aToHex(account.publicKey);
+        
+        // Store wallet info
+        this.wallets.set(address, { 
+          privateKey,
+          publicKey,
+          mnemonic
+        });
+        
+        console.log(`Created Polkadot wallet with address: ${address}`);
+        return address;
+      } catch (mnemonicError) {
+        const err = mnemonicError as Error;
+        console.error('Error creating account from mnemonic:', err.message);
+        console.error('Stack trace:', err.stack || 'No stack trace available');
+        throw new Error(`Failed to create account from mnemonic: ${err.message}`);
+      }
     } catch (error) {
-      console.error('Error creating Polkadot wallet:', error);
+      const err = error as Error;
+      console.error('Error creating Polkadot wallet:', err.message);
+      console.error('Stack trace:', err.stack || 'No stack trace available');
       
       // Fall back to simulation
       console.warn('Falling back to simulated wallet creation');
