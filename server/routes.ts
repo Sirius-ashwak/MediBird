@@ -6,7 +6,7 @@ import { aiService } from "./aiService";
 import session from "express-session";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { WebSocketServer } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 import MemoryStore from "memorystore";
 import { z } from "zod";
 import { ZodError } from "zod";
@@ -500,6 +500,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Not authorized to verify this record" });
       }
 
+      // Make sure blockchainHash is not null
+      if (!record.blockchainHash) {
+        return res.status(400).json({ message: "Record does not have a blockchain hash" });
+      }
+      
       const isVerified = await blockchain.verifyRecord(record.blockchainHash, {
         type: record.type,
         title: record.title,
@@ -572,22 +577,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server and WebSocket server
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ 
-    server: httpServer,
-    // Add error handling for WebSocket server
+    server: httpServer, 
+    path: '/ws',  // Use a distinct path to avoid conflicts with Vite HMR
     clientTracking: true,
-    perMessageDeflate: false
+    perMessageDeflate: false,
+    // Handle WebSocket CORS
+    verifyClient: (info, callback) => {
+      // Allow all origins for WebSocket connections
+      callback(true);
+    }
   });
-
+  
+  // Store connected clients with their user info
+  const clients = new Map();
+  
   // Handle WebSocket connections for real-time updates
-  wss.on("connection", (ws) => {
+  wss.on("connection", (ws, req) => {
     console.log("WebSocket client connected");
+    
+    // Add a ping-pong mechanism to keep connections alive
+    const pingInterval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.ping();
+      }
+    }, 30000);
     
     // Handle incoming messages
     ws.on("message", (message) => {
       try {
         const data = JSON.parse(message.toString());
-        // Handle different types of messages/events
         console.log("Received WebSocket message:", data);
+        
+        // Handle different message types
+        switch (data.type) {
+          case 'auth':
+            // Store user info with this connection
+            if (data.userId) {
+              clients.set(ws, { userId: data.userId });
+              // Send acknowledgment
+              ws.send(JSON.stringify({ type: 'auth_success' }));
+            }
+            break;
+            
+          case 'medical_update':
+            // Broadcast medical record updates to authorized users
+            if (clients.has(ws) && clients.get(ws).userId) {
+              // In a real app, check permissions before broadcasting
+              broadcastToAuthorizedUsers(data, clients.get(ws).userId);
+            }
+            break;
+            
+          case 'consent_changed':
+            // Handle consent changes in real-time
+            if (clients.has(ws) && data.providerId) {
+              notifyProvider(data.providerId, data);
+            }
+            break;
+            
+          default:
+            console.log('Unhandled message type:', data.type);
+        }
       } catch (err) {
         console.error("Error processing WebSocket message:", err);
       }
@@ -602,8 +651,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Handle connection close
     ws.on("close", () => {
       console.log("WebSocket client disconnected");
+      // Clear ping interval
+      clearInterval(pingInterval);
+      // Remove client from tracking
+      clients.delete(ws);
     });
   });
+  
+  // Function to broadcast messages to users authorized to receive updates
+  function broadcastToAuthorizedUsers(data: Record<string, any>, senderUserId: number): void {
+    clients.forEach((clientData, client) => {
+      // Only send to clients in OPEN state
+      if (client.readyState === WebSocket.OPEN) {
+        // Check if this client should receive the message
+        // In a real app, this would check consent records
+        if (clientData.userId !== senderUserId) {
+          // Only send to relevant providers or specific users
+          client.send(JSON.stringify({
+            type: 'update',
+            data: data
+          }));
+        }
+      }
+    });
+  }
+  
+  // Function to notify a specific provider
+  function notifyProvider(providerId: number, data: Record<string, any>): void {
+    clients.forEach((clientData, client) => {
+      if (client.readyState === WebSocket.OPEN && clientData.providerId === providerId) {
+        client.send(JSON.stringify({
+          type: 'consent_notification',
+          data: data
+        }));
+      }
+    });
+  }
   
   // Add error handler for the WebSocket server
   wss.on("error", (error) => {

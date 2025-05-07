@@ -7,6 +7,7 @@ import {
   UserVoiceIcon, LockIcon, HospitalIcon, 
   ExchangeIcon, ShieldCheckIcon, LogoutIcon 
 } from "@/lib/icons";
+import { MessageSquareIcon } from "lucide-react";
 
 export default function Sidebar() {
   const [location] = useLocation();
@@ -21,6 +22,7 @@ export default function Sidebar() {
     { path: "/consent", label: "Consent Management", icon: <LockIcon /> },
     { path: "/providers", label: "Healthcare Providers", icon: <HospitalIcon /> },
     { path: "/transactions", label: "Blockchain Logs", icon: <ExchangeIcon /> },
+    { path: "/websocket", label: "WebSocket Demo", icon: <MessageSquareIcon className="h-5 w-5" /> },
   ];
 
   return (

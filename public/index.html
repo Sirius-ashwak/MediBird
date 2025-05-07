@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>MediBridge - Decentralized Healthcare Platform</title>
     <meta name="description" content="A secure, AI-powered healthcare platform using blockchain technology for privacy and data integrity." />
+    <link rel="manifest" href="/app.webmanifest" />
+    <meta name="theme-color" content="#2563eb" />
     <style>
       body {
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
@@ -25,7 +27,7 @@
         padding: 2rem;
         border-radius: 0.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        max-width: 28rem;
+        max-width: 34rem;
         width: 100%;
         margin: 1rem;
       }
@@ -67,9 +69,22 @@
         cursor: pointer;
         font-weight: 500;
         margin-top: 1rem;
+        margin-right: 0.5rem;
       }
       .button:hover {
         background-color: #1d4ed8;
+      }
+      .button-secondary {
+        background-color: #6b7280;
+      }
+      .button-secondary:hover {
+        background-color: #4b5563;
+      }
+      .button-success {
+        background-color: #10b981;
+      }
+      .button-success:hover {
+        background-color: #059669;
       }
       .feature-list {
         margin-top: 1.5rem;
@@ -82,6 +97,89 @@
       .feature-icon {
         margin-right: 0.5rem;
         color: #2563eb;
+      }
+      .tabs {
+        display: flex;
+        margin-top: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .tab {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        font-weight: 500;
+      }
+      .tab.active {
+        border-bottom: 2px solid #2563eb;
+        color: #2563eb;
+      }
+      .tab-content {
+        display: none;
+        padding: 1rem 0;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .ws-messages {
+        height: 200px;
+        overflow-y: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+        background-color: #f9fafb;
+      }
+      .message {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+      }
+      .message-from-server {
+        background-color: #e0f2fe;
+        border-left: 3px solid #0ea5e9;
+      }
+      .message-from-client {
+        background-color: #dcfce7;
+        border-left: 3px solid #10b981;
+      }
+      .message-error {
+        background-color: #fee2e2;
+        border-left: 3px solid #ef4444;
+      }
+      .ws-input {
+        display: flex;
+        margin-top: 0.5rem;
+      }
+      .ws-input input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.25rem;
+        margin-right: 0.5rem;
+      }
+      .ws-status {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        background-color: #ef4444;
+      }
+      .ws-status.connected {
+        background-color: #10b981;
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-left: 0.5rem;
+      }
+      .badge-info {
+        background-color: #e0f2fe;
+        color: #0369a1;
       }
     </style>
   </head>
@@ -110,18 +208,79 @@
             <span class="feature-icon">✓</span>
             <span>User-controlled consent management</span>
           </div>
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>Real-time updates via WebSockets</span>
+          </div>
         </div>
         
-        <div class="status-box">
-          <p>System Status: <span id="status">Checking connection...</span></p>
-          <div id="api-status" class="api-status"></div>
-          <button id="check-api" class="button">Check API Connection</button>
+        <div class="tabs">
+          <div class="tab active" data-tab="api">API Status</div>
+          <div class="tab" data-tab="websocket">WebSocket Demo</div>
+        </div>
+        
+        <div id="api-tab" class="tab-content active">
+          <div class="status-box">
+            <p>System Status: <span id="status">Checking connection...</span></p>
+            <div id="api-status" class="api-status"></div>
+            <button id="check-api" class="button">Check API Connection</button>
+          </div>
+        </div>
+        
+        <div id="websocket-tab" class="tab-content">
+          <div class="status-box">
+            <p>
+              <span class="ws-status" id="ws-status-indicator"></span>
+              WebSocket Status: <span id="ws-status">Disconnected</span>
+            </p>
+            
+            <div class="ws-messages" id="ws-messages">
+              <!-- Messages will be added here -->
+            </div>
+            
+            <div class="ws-input">
+              <input 
+                type="text" 
+                id="ws-message" 
+                placeholder="Type a message to send" 
+                disabled
+              />
+              <button 
+                id="ws-send" 
+                class="button button-secondary" 
+                disabled
+              >Send</button>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+              <button id="ws-connect" class="button">Connect WebSocket</button>
+              <button id="ws-disconnect" class="button button-secondary" disabled>Disconnect</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            const tabName = tab.getAttribute('data-tab');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+          });
+        });
+        
+        // API Health Check
         const statusElement = document.getElementById('status');
         const apiStatusElement = document.getElementById('api-status');
         const checkApiButton = document.getElementById('check-api');
@@ -150,6 +309,137 @@
               apiStatusElement.style.backgroundColor = '#fee2e2';
             });
         });
+        
+        // WebSocket functionality
+        const wsStatusIndicator = document.getElementById('ws-status-indicator');
+        const wsStatusText = document.getElementById('ws-status');
+        const wsMessagesContainer = document.getElementById('ws-messages');
+        const wsMessageInput = document.getElementById('ws-message');
+        const wsSendButton = document.getElementById('ws-send');
+        const wsConnectButton = document.getElementById('ws-connect');
+        const wsDisconnectButton = document.getElementById('ws-disconnect');
+        
+        let socket = null;
+        
+        function updateConnectionStatus(isConnected, statusMessage = null) {
+          if (isConnected) {
+            wsStatusIndicator.classList.add('connected');
+            wsStatusText.textContent = statusMessage || 'Connected';
+            wsStatusText.style.color = 'green';
+            wsMessageInput.disabled = false;
+            wsSendButton.disabled = false;
+            wsConnectButton.disabled = true;
+            wsDisconnectButton.disabled = false;
+          } else {
+            wsStatusIndicator.classList.remove('connected');
+            wsStatusText.textContent = statusMessage || 'Disconnected';
+            wsStatusText.style.color = 'red';
+            wsMessageInput.disabled = true;
+            wsSendButton.disabled = true;
+            wsConnectButton.disabled = false;
+            wsDisconnectButton.disabled = true;
+          }
+        }
+        
+        function addMessage(message, type) {
+          const messageElement = document.createElement('div');
+          messageElement.classList.add('message');
+          messageElement.classList.add(`message-${type}`);
+          messageElement.textContent = message;
+          wsMessagesContainer.appendChild(messageElement);
+          wsMessagesContainer.scrollTop = wsMessagesContainer.scrollHeight;
+        }
+        
+        wsConnectButton.addEventListener('click', () => {
+          try {
+            // Construct WebSocket URL with the correct protocol and path
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.hostname;
+            const port = '5000'; // MediBridge server port
+            const wsUrl = `${protocol}//${host}:${port}/ws`;
+            
+            addMessage(`Connecting to ${wsUrl}...`, 'from-client');
+            
+            socket = new WebSocket(wsUrl);
+            
+            socket.addEventListener('open', () => {
+              updateConnectionStatus(true);
+              addMessage('Connection established!', 'from-server');
+              
+              // Send authentication message
+              const authMessage = {
+                type: 'auth',
+                userId: 1 // Demo user ID
+              };
+              socket.send(JSON.stringify(authMessage));
+            });
+            
+            socket.addEventListener('message', (event) => {
+              try {
+                const data = JSON.parse(event.data);
+                addMessage(`Received: ${JSON.stringify(data)}`, 'from-server');
+              } catch (e) {
+                addMessage(`Received: ${event.data}`, 'from-server');
+              }
+            });
+            
+            socket.addEventListener('error', (error) => {
+              updateConnectionStatus(false, 'Error');
+              addMessage(`WebSocket error: ${error.message || 'Unknown error'}`, 'error');
+            });
+            
+            socket.addEventListener('close', (event) => {
+              updateConnectionStatus(false);
+              addMessage(`Connection closed. Code: ${event.code}, Reason: ${event.reason || 'No reason provided'}`, 'from-server');
+            });
+          } catch (error) {
+            updateConnectionStatus(false, 'Error');
+            addMessage(`Failed to connect: ${error.message}`, 'error');
+          }
+        });
+        
+        wsDisconnectButton.addEventListener('click', () => {
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+            addMessage('Disconnected from server', 'from-client');
+          }
+        });
+        
+        wsSendButton.addEventListener('click', () => {
+          sendMessage();
+        });
+        
+        wsMessageInput.addEventListener('keypress', (event) => {
+          if (event.key === 'Enter') {
+            sendMessage();
+          }
+        });
+        
+        function sendMessage() {
+          const message = wsMessageInput.value.trim();
+          if (!message) return;
+          
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            try {
+              const messageObj = {
+                type: 'medical_update',
+                content: message,
+                timestamp: new Date().toISOString()
+              };
+              
+              socket.send(JSON.stringify(messageObj));
+              addMessage(`Sent: ${message}`, 'from-client');
+              wsMessageInput.value = '';
+            } catch (error) {
+              addMessage(`Failed to send message: ${error.message}`, 'error');
+            }
+          } else {
+            addMessage('Cannot send message: WebSocket is not connected', 'error');
+          }
+        }
+        
+        // Initialize with disconnected state
+        updateConnectionStatus(false);
       });
     </script>
   </body>

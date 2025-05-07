@@ -10,6 +10,7 @@ import AIConsultations from "@/pages/AIConsultations";
 import ConsentManagement from "@/pages/ConsentManagement";
 import Providers from "@/pages/Providers";
 import BlockchainLogs from "@/pages/BlockchainLogs";
+import WebSocketDemo from "@/pages/WebSocketDemo";
 import MainLayout from "@/layouts/MainLayout";
 import { ThemeProvider } from "next-themes";
 
@@ -23,6 +24,7 @@ function Router() {
         <Route path="/consent" component={ConsentManagement} />
         <Route path="/providers" component={Providers} />
         <Route path="/transactions" component={BlockchainLogs} />
+        <Route path="/websocket" component={WebSocketDemo} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

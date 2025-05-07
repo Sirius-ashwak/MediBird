@@ -7,6 +7,7 @@ import {
   UserVoiceIcon, LockIcon, HospitalIcon, 
   ExchangeIcon, LogoutIcon 
 } from "@/lib/icons";
+import { MessageSquareIcon } from "lucide-react";
 
 interface MobileNavProps {
   onClose?: () => void;
@@ -61,6 +62,7 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
     { path: "/consent", label: "Consent Management", icon: <LockIcon /> },
     { path: "/providers", label: "Healthcare Providers", icon: <HospitalIcon /> },
     { path: "/transactions", label: "Blockchain Logs", icon: <ExchangeIcon /> },
+    { path: "/websocket", label: "WebSocket Demo", icon: <MessageSquareIcon className="h-5 w-5" /> },
   ];
 
   return (
