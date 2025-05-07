@@ -144,18 +144,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    res.json({ user: req.user });
+    // Return a clone of the user object to avoid mutations
+    const userObj = JSON.parse(JSON.stringify(req.user));
+    res.json({ user: userObj });
   });
 
-  app.post("/api/logout", (req, res) => {
-    req.logout(() => {
+  app.post("/api/logout", (req, res, next) => {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
       res.json({ success: true });
     });
   });
 
   app.get("/api/user", (req, res) => {
-    if (req.isAuthenticated()) {
-      return res.json({ user: req.user });
+    if (req.isAuthenticated() && req.user) {
+      // Return a clone of the user object to avoid mutations
+      const userObj = JSON.parse(JSON.stringify(req.user));
+      return res.json({ user: userObj });
     }
     return res.status(401).json({ message: "Not authenticated" });
   });

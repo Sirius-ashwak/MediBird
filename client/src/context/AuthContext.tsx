@@ -73,7 +73,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
       
       const res = await apiRequest("POST", "/api/login", { username, password });
-      const data = await res.json();
+      // Clone the response before reading the body
+      const resClone = res.clone();
+      const data = await resClone.json();
       setUser(data.user);
       
       toast({

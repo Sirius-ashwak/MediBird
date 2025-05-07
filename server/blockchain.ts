@@ -7,6 +7,7 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { cryptoWaitReady, mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto';
 import { u8aToHex, hexToU8a, stringToU8a } from '@polkadot/util';
 import { createHash } from "crypto";
+import { smartContracts } from './smartContracts';
 
 // Initialize Polkadot connection - use a public Westend endpoint (Polkadot testnet)
 let apiInstance: ApiPromise | null = null;
@@ -186,16 +187,12 @@ class BlockchainService {
   }
 
   /**
-   * Stores a medical record on the blockchain using Polkadot
+   * Stores a medical record on the blockchain using Polkadot and smart contracts
    */
   async storeRecord(record: BlockchainRecord): Promise<string> {
     try {
       // Try to connect to Polkadot network
       const api = await getPolkadotApi();
-      
-      if (!api || !apiConnected) {
-        throw new Error('Polkadot API not connected');
-      }
       
       // Calculate hash of the record for on-chain reference
       const recordString = JSON.stringify(record);
@@ -210,13 +207,7 @@ class BlockchainService {
         details: `${record.type}:${record.title}`
       };
       
-      // Convert metadata to bytes
-      const metadataU8a = stringToU8a(JSON.stringify(metadata));
-      
-      // Use system.remark to store the data on chain
-      // This is a common pattern for storing arbitrary data in Polkadot
-      // In production, you would use a custom pallet or smart contract
-      console.log('Submitting record to Polkadot blockchain...');
+      console.log('Submitting record to blockchain via smart contract...');
       
       // Get the first wallet for demo purposes
       // In production, you'd use the specific user's wallet
@@ -227,22 +218,42 @@ class BlockchainService {
       
       const [address, walletInfo] = walletEntry;
       
-      // In this demo, we don't actually submit the transaction 
-      // as it would require a funded account on Westend
-      console.log(`Would submit transaction from ${address} with data hash ${dataHash}`);
+      // Create a smart contract for this medical record
+      const contractId = await smartContracts.createMedicalRecordContract(
+        api,
+        this.keyring,
+        record.userId,
+        record.type,
+        record.title,
+        dataHash,
+        address
+      );
       
-      // Store the record in our local cache
+      console.log(`Created medical record smart contract with ID: ${contractId}`);
+      
+      // Store the record in our local cache with reference to the contract
       this.records.set(dataHash, record);
       
       // Return the transaction hash
       return dataHash;
     } catch (error) {
-      console.error('Error storing record on Polkadot:', error);
+      console.error('Error storing record with smart contract:', error);
       
       // Fall back to simulation
       console.warn('Falling back to simulated blockchain record storage');
       const recordString = JSON.stringify(record);
       const hash = this.generateTransactionHash(recordString);
+      
+      // Still create a contract, but in simulation mode
+      await smartContracts.createMedicalRecordContract(
+        null,
+        null,
+        record.userId,
+        record.type,
+        record.title,
+        hash,
+        `simulated-${record.userId}`
+      );
       
       this.records.set(hash, record);
       
@@ -306,15 +317,11 @@ class BlockchainService {
   }
 
   /**
-   * Stores a consent record on the blockchain
+   * Stores a consent record on the blockchain using smart contracts
    */
   async storeConsent(consent: BlockchainConsent): Promise<string> {
     try {
       const api = await getPolkadotApi();
-      
-      if (!api || !apiConnected) {
-        throw new Error('Polkadot API not connected');
-      }
       
       // Calculate hash of the consent for on-chain reference
       const consentString = JSON.stringify(consent);
@@ -329,7 +336,22 @@ class BlockchainService {
         details: `Provider:${consent.providerId},Access:${consent.dataType},Status:${consent.status}`
       };
       
-      console.log(`Would submit consent transaction with data hash ${dataHash}`);
+      console.log('Creating consent smart contract...');
+      
+      // Default consent duration - 30 days
+      const consentDuration = 30;
+      
+      // Create the consent smart contract
+      const contractId = await smartContracts.createConsentContract(
+        api,
+        this.keyring,
+        consent.userId,
+        consent.providerId,
+        [consent.dataType],
+        consentDuration
+      );
+      
+      console.log(`Created consent smart contract with ID: ${contractId}`);
       
       // Store the consent in our local cache
       this.consents.set(dataHash, consent);
@@ -337,12 +359,22 @@ class BlockchainService {
       // Return the transaction hash
       return dataHash;
     } catch (error) {
-      console.error('Error storing consent on Polkadot:', error);
+      console.error('Error storing consent with smart contract:', error);
       
       // Fall back to simulation
       console.warn('Falling back to simulated blockchain consent storage');
       const consentString = JSON.stringify(consent);
       const hash = this.generateTransactionHash(consentString);
+      
+      // Still create a contract, but in simulation mode
+      await smartContracts.createConsentContract(
+        null,
+        null,
+        consent.userId,
+        consent.providerId,
+        [consent.dataType],
+        30 // 30 days default duration
+      );
       
       // Store the consent
       this.consents.set(hash, consent);
@@ -355,15 +387,11 @@ class BlockchainService {
   }
 
   /**
-   * Updates a consent record on the blockchain
+   * Updates a consent record on the blockchain using smart contracts
    */
   async updateConsent(update: BlockchainConsentUpdate): Promise<string> {
     try {
       const api = await getPolkadotApi();
-      
-      if (!api || !apiConnected) {
-        throw new Error('Polkadot API not connected');
-      }
       
       // Calculate hash of the consent update for on-chain reference
       const updateString = JSON.stringify(update);
@@ -378,19 +406,45 @@ class BlockchainService {
         details: `ConsentId:${update.consentId},NewStatus:${update.status}`
       };
       
-      console.log(`Would submit consent update transaction with data hash ${dataHash}`);
+      console.log('Updating consent smart contract...');
       
-      // In a real implementation, we would update the consent on chain
+      // In this implementation, we assume the consentId is the smart contract ID
+      // In a real implementation, we would have a mapping between database IDs and contract IDs
+      // Find the contract ID from our stored consents
+      let contractId = update.consentId.toString();
+      
+      // If the status is 'revoked', use the smart contract to revoke consent
+      if (update.status === 'revoked') {
+        try {
+          await smartContracts.revokeConsent(contractId, update.userId);
+          console.log(`Revoked consent contract with ID: ${contractId}`);
+        } catch (error) {
+          console.error('Error revoking consent contract:', error);
+          // Use a fallback contract ID if needed
+          contractId = `cs-${update.consentId.toString()}`;
+          await smartContracts.revokeConsent(contractId, update.userId);
+        }
+      }
       
       // Return the transaction hash
       return dataHash;
     } catch (error) {
-      console.error('Error updating consent on Polkadot:', error);
+      console.error('Error updating consent with smart contract:', error);
       
       // Fall back to simulation
       console.warn('Falling back to simulated blockchain consent update');
       const updateString = JSON.stringify(update);
       const hash = this.generateTransactionHash(updateString);
+      
+      // Try to simulate the revocation anyway
+      try {
+        // In a simulated environment, we'll use a synthetic contract ID
+        const contractId = `cs-${update.consentId.toString()}`;
+        await smartContracts.revokeConsent(contractId, update.userId);
+      } catch (error) {
+        const err = error as Error;
+        console.warn('Could not simulate consent revocation:', err.message || 'Unknown error');
+      }
       
       // Simulate blockchain confirmation delay
       await this.simulateBlockchainDelay();
