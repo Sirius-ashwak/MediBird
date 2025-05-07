@@ -15,11 +15,16 @@ app.get('/websocket-test', (req, res) => {
 app.use((req, res, next) => {
   // Enable CORS for all routes with credentials support
   const origin = req.headers.origin;
+  
+  // Make sure we accept requests from our own domain
+  // In development, this could be the Vite server
   if (origin) {
     res.header("Access-Control-Allow-Origin", origin);
   } else {
+    // Default to own server
     res.header("Access-Control-Allow-Origin", "http://localhost:5000");
   }
+  
   res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.header("Access-Control-Allow-Credentials", "true");

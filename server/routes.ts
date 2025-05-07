@@ -47,10 +47,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     cookie: { 
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "lax"
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: "lax",
+      path: "/"
     },
-    store: new MemorySessionStore({ checkPeriod: 86400000 }),
+    store: new MemorySessionStore({ 
+      checkPeriod: 86400000, // Clear expired sessions every 24 hours
+      stale: false // Don't allow stale sessions
+    }),
   });
 
   app.use(sessionMiddleware);
