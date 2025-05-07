@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# This script serves as an entry point for the Replit workflow
-# Set environment variables needed for the application
-export NODE_ENV=development
-export GOOGLE_API_KEY=AIzaSyAgev0-OnF9IKw_pdiJFZnmOLwjV1i0VjI
+# Check if environment variables are set
+if [ ! -f .env ]; then
+  echo "Warning: .env file not found. Using default environment variables."
+  echo "Copy .env.example to .env and update with your API keys for full functionality."
+fi
 
 # Start the application
 npm run dev

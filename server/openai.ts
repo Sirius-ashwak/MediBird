@@ -6,6 +6,11 @@
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources";
 
+// Check if OpenAI API key is available
+if (!process.env.OPENAI_API_KEY) {
+  console.warn('OPENAI_API_KEY environment variable is not set. OpenAI features will not work properly.');
+}
+
 // Initialize the OpenAI client with the API key from environment variables
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY

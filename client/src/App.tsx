@@ -11,6 +11,7 @@ import ConsentManagement from "@/pages/ConsentManagement";
 import Providers from "@/pages/Providers";
 import BlockchainLogs from "@/pages/BlockchainLogs";
 import WebSocketDemo from "@/pages/WebSocketDemo";
+import WelcomePage from "@/pages/WelcomePage";
 import MainLayout from "@/layouts/MainLayout";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
@@ -68,8 +69,8 @@ function Router() {
 
   // Public routes
   if (!isAuthenticated) {
-    if (location !== "/login" && location !== "/auth") {
-      return <Redirect to="/login" />;
+    if (location !== "/login" && location !== "/auth" && location !== "/welcome" && location !== "/") {
+      return <Redirect to="/welcome" />;
     }
     
     return (
@@ -80,8 +81,14 @@ function Router() {
         <Route path="/auth">
           <LoginPage />
         </Route>
+        <Route path="/welcome">
+          <WelcomePage />
+        </Route>
+        <Route path="/" exact>
+          <WelcomePage />
+        </Route>
         <Route path="*">
-          <Redirect to="/login" />
+          <Redirect to="/welcome" />
         </Route>
       </Switch>
     );

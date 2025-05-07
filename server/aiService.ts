@@ -8,10 +8,15 @@ import { openAIService } from './openai';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
 // Configure fallback Gemini API
-const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY || "AIzaSyAgev0-OnF9IKw_pdiJFZnmOLwjV1i0VjI";
+const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY || 'AIzaSyAgev0-OnF9IKw_pdiJFZnmOLwjV1i0VjI';
 const MODEL_NAME = "gemini-1.5-pro";
 
-// Initialize the Gemini API client (for fallback)
+// Check if API key is available from environment
+if (!process.env.GOOGLE_GEMINI_API_KEY) {
+  console.warn('GOOGLE_GEMINI_API_KEY environment variable is not set. Using fallback key.');
+}
+
+// Initialize the Gemini API client
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 

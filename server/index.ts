@@ -2,6 +2,16 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
+import dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Log environment variables status (without revealing values)
+console.log("Environment variables loaded:");
+console.log("- GOOGLE_GEMINI_API_KEY:", process.env.GOOGLE_GEMINI_API_KEY ? "Set ✓" : "Not set ✗");
+console.log("- OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "Set ✓" : "Not set ✗");
+console.log("- POLKADOT_ENDPOINT:", process.env.POLKADOT_ENDPOINT ? "Set ✓" : "Not set ✗");
 
 const app = express();
 app.use(express.json());

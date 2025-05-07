@@ -16,7 +16,7 @@ let connectionAttempted = false;
 
 // Polkadot network configuration
 const NETWORK_CONFIG = {
-  endpoint: 'wss://westend-rpc.polkadot.io',
+  endpoint: process.env.POLKADOT_ENDPOINT || 'wss://westend-rpc.polkadot.io',
   ss58Format: 42,  // Westend SS58 format
   chainName: 'Westend'
 };
