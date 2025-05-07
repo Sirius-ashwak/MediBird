@@ -454,7 +454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const aiResponse = await aiService.getResponse(message, req.user.id);
 
       // Save the AI response
-      await storage.createAiMessage({
+      const aiMessageRecord = await storage.createAiMessage({
         consultationId: activeConsultationId,
         content: aiResponse,
         sender: "ai",
@@ -469,7 +469,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: { consultationId: activeConsultationId },
       });
 
-      res.json({ response: aiResponse, consultationId: activeConsultationId });
+      res.json({ 
+        response: aiResponse, 
+        consultationId: activeConsultationId,
+        messageId: aiMessageRecord.id
+      });
     } catch (err) {
       console.error("Error processing AI message:", err);
       res.status(500).json({ message: "Server error" });

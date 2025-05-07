@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AIIcon, SendIcon, ShieldCheckIcon } from "@/lib/icons";
-import { queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
+import { AiConsultation, AiMessage } from "@shared/schema";
+import { useAuth } from "@/context/AuthContext";
 
 interface Message {
   id: string;
@@ -17,62 +19,68 @@ interface Message {
   timestamp: Date;
 }
 
-interface Consultation {
-  id: string;
-  title: string;
-  date: string;
-  snippet: string;
-  status: "active" | "completed";
-}
-
 export default function AIConsultations() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [activeConsultation, setActiveConsultation] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
   
-  const { data: consultations, isLoading } = useQuery({
+  // Function to get user initials
+  const getUserInitials = (): string => {
+    if (!user) return "U";
+    
+    if (user.name) {
+      // Split name by spaces and get first character of each part
+      const nameParts = user.name.split(" ");
+      if (nameParts.length >= 2) {
+        return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+      }
+      // If only one name part, use first two characters
+      return user.name.substring(0, 2).toUpperCase();
+    }
+    
+    // Fallback to first two characters of username
+    return user.username.substring(0, 2).toUpperCase();
+  };
+  
+  const { data: consultations, isLoading } = useQuery<AiConsultation[]>({
     queryKey: ["/api/ai/consultations"],
   });
 
   useEffect(() => {
-    if (activeConsultation === null && consultations?.length > 0) {
-      setActiveConsultation(consultations[0].id);
+    if (activeConsultation === null && consultations && consultations.length > 0) {
+      setActiveConsultation(consultations[0].id.toString());
     }
   }, [consultations, activeConsultation]);
 
   // Fetch messages for active consultation
+  const { data: messageData, isLoading: messagesLoading } = useQuery({
+    queryKey: ["/api/ai/consultations", activeConsultation, "messages"],
+    queryFn: async () => {
+      if (!activeConsultation) return [];
+      const response = await fetch(`/api/ai/consultations/${activeConsultation}/messages`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch messages");
+      }
+      return await response.json();
+    },
+    enabled: !!activeConsultation,
+  });
+
+  // Update messages when data changes
   useEffect(() => {
-    if (activeConsultation) {
-      // In a real app, we would fetch messages from the API
-      setMessages([
-        {
-          id: "welcome",
-          content: "Hello! How can I help you with your health today?",
-          sender: "ai",
-          timestamp: new Date()
-        },
-        {
-          id: "user-1",
-          content: "I've been having headaches and feeling tired lately.",
-          sender: "user",
-          timestamp: new Date()
-        },
-        {
-          id: "ai-1",
-          content: "I'm sorry to hear that. Let me ask you a few questions to better understand your symptoms:\n\n- How long have you been experiencing these headaches?\n- Are they occurring at specific times of day?\n- How would you describe your sleep patterns lately?\n- Have you noticed any changes in your diet or water intake?\n\nNote: This is preliminary information and not a medical diagnosis.",
-          sender: "ai",
-          timestamp: new Date()
-        },
-        {
-          id: "user-2",
-          content: "The headaches started about a week ago, usually in the afternoon. My sleep has been irregular because of work, and I might not be drinking enough water.",
-          sender: "user",
-          timestamp: new Date() 
-        }
-      ]);
+    if (messageData && Array.isArray(messageData)) {
+      const formattedMessages = messageData.map(msg => ({
+        id: msg.id.toString(),
+        content: msg.content,
+        sender: msg.sender,
+        timestamp: new Date(msg.timestamp)
+      }));
+      setMessages(formattedMessages);
     }
-  }, [activeConsultation]);
+  }, [messageData]);
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -151,49 +159,65 @@ export default function AIConsultations() {
                     <Skeleton className="h-16 w-full" />
                     <Skeleton className="h-16 w-full" />
                   </div>
-                ) : (
+                ) : consultations && consultations.length > 0 ? (
                   <div className="space-y-2">
-                    <div 
-                      className={`p-3 rounded-lg cursor-pointer ${activeConsultation === "1" ? "bg-primary-50 border border-primary-100" : "bg-neutral-50 border border-neutral-200 hover:bg-neutral-100"}`}
-                      onClick={() => setActiveConsultation("1")}
-                    >
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">Headache & Fatigue</h4>
-                        <Badge variant="outline" className="bg-green-50 text-green-700 text-xs">Active</Badge>
+                    {consultations.map((consultation) => (
+                      <div 
+                        key={consultation.id}
+                        className={`p-3 rounded-lg cursor-pointer ${
+                          activeConsultation === consultation.id.toString() 
+                            ? "bg-primary-50 border border-primary-100" 
+                            : "bg-neutral-50 border border-neutral-200 hover:bg-neutral-100"
+                        }`}
+                        onClick={() => setActiveConsultation(consultation.id.toString())}
+                      >
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium text-sm">{consultation.title}</h4>
+                          <Badge 
+                            variant="outline" 
+                            className={consultation.status === "active" 
+                              ? "bg-green-50 text-green-700 text-xs" 
+                              : "bg-neutral-100 text-neutral-700 text-xs"
+                            }
+                          >
+                            {consultation.status === "active" ? "Active" : "Completed"}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          {consultation.createdAt ? new Date(consultation.createdAt).toLocaleDateString() : 'Unknown date'}
+                        </p>
+                        <p className="text-xs text-neutral-600 mt-2 truncate">
+                          {consultation.title}
+                        </p>
                       </div>
-                      <p className="text-xs text-neutral-500 mt-1">Jul 19, 2023</p>
-                      <p className="text-xs text-neutral-600 mt-2 truncate">
-                        Discussing headaches and fatigue symptoms...
-                      </p>
-                    </div>
-                    
-                    <div 
-                      className={`p-3 rounded-lg cursor-pointer ${activeConsultation === "2" ? "bg-primary-50 border border-primary-100" : "bg-neutral-50 border border-neutral-200 hover:bg-neutral-100"}`}
-                      onClick={() => setActiveConsultation("2")}
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <p className="text-neutral-500">No consultations yet</p>
+                    <Button 
+                      className="mt-2"
+                      onClick={() => {
+                        // Create a new consultation via API
+                        fetch("/api/ai/consultations", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ 
+                            title: "New Consultation", 
+                            status: "active" 
+                          })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                          setActiveConsultation(data.id.toString());
+                          queryClient.invalidateQueries({ 
+                            queryKey: ["/api/ai/consultations"] 
+                          });
+                        });
+                      }}
                     >
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">Allergies Discussion</h4>
-                        <Badge variant="outline" className="bg-neutral-100 text-neutral-700 text-xs">Completed</Badge>
-                      </div>
-                      <p className="text-xs text-neutral-500 mt-1">Jul 10, 2023</p>
-                      <p className="text-xs text-neutral-600 mt-2 truncate">
-                        Seasonal allergies and preventive measures...
-                      </p>
-                    </div>
-                    
-                    <div 
-                      className={`p-3 rounded-lg cursor-pointer ${activeConsultation === "3" ? "bg-primary-50 border border-primary-100" : "bg-neutral-50 border border-neutral-200 hover:bg-neutral-100"}`}
-                      onClick={() => setActiveConsultation("3")}
-                    >
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-sm">Sleep Improvement</h4>
-                        <Badge variant="outline" className="bg-neutral-100 text-neutral-700 text-xs">Completed</Badge>
-                      </div>
-                      <p className="text-xs text-neutral-500 mt-1">Jun 28, 2023</p>
-                      <p className="text-xs text-neutral-600 mt-2 truncate">
-                        Strategies for improving sleep quality...
-                      </p>
-                    </div>
+                      Start New Consultation
+                    </Button>
                   </div>
                 )}
               </CardContent>
@@ -256,7 +280,7 @@ export default function AIConsultations() {
                         {message.sender === 'user' && (
                           <div className="w-8 h-8 rounded-full bg-primary-100 flex-shrink-0 flex items-center justify-center">
                             <span className="text-primary-700 text-xs font-medium">
-                              SJ
+                              {getUserInitials()}
                             </span>
                           </div>
                         )}
