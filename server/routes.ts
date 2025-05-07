@@ -554,10 +554,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new blockchain wallet
   app.post("/api/blockchain/wallet", async (req: any, res) => {
     try {
+      console.log("API: Creating new blockchain wallet...");
       const walletAddress = await blockchain.createWallet();
+      console.log(`API: Wallet created successfully with address: ${walletAddress}`);
       
       // If user is authenticated, record the activity
       if (req.isAuthenticated() && req.user) {
+        console.log(`API: Recording wallet creation for user ID: ${req.user.id}`);
         // Record this activity
         await storage.createActivity({
           userId: req.user.id,
@@ -583,10 +586,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString()
       });
     } catch (err) {
-      console.error("Error creating blockchain wallet:", err);
+      const error = err as Error;
+      console.error("Error creating blockchain wallet:", error.message);
+      console.error("Stack trace:", error.stack || "No stack trace available");
+      
+      // Check if the error is related to the polkadot.js library
+      const errorMessage = error.message.toLowerCase();
+      let userFriendlyMessage = "Failed to create blockchain wallet";
+      
+      if (errorMessage.includes("keyring") || errorMessage.includes("crypto")) {
+        userFriendlyMessage = "Failed to initialize blockchain cryptography. Using simulated wallet instead.";
+      } else if (errorMessage.includes("mnemonic")) {
+        userFriendlyMessage = "Failed to generate secure wallet credentials. Using simulated wallet instead.";
+      }
+      
       res.status(500).json({ 
-        message: "Failed to create blockchain wallet",
-        error: (err as Error).message
+        message: userFriendlyMessage,
+        error: error.message,
+        walletAddress: error.message.includes("simulated") ? error.message.split("address: ")[1] : null
       });
     }
   });
