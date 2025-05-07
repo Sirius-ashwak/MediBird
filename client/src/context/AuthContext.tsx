@@ -45,7 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
       try {
         setError(null);
-        const res = await fetchWithRetry("/api/user", { 
+        const res = await fetch("/api/user", { 
+          method: "GET",
           credentials: "include",
           headers: {
             "Accept": "application/json"
@@ -55,9 +56,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
+        } else {
+          // If not authenticated, explicitly set user to null
+          setUser(null);
         }
       } catch (err) {
         console.error("Error checking auth:", err);
+        // Set user to null on error
+        setUser(null);
         // Don't show toast for initial auth check errors
       } finally {
         setLoading(false);
@@ -72,10 +78,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       setError(null);
       
-      const res = await apiRequest("POST", "/api/login", { username, password });
-      // Clone the response before reading the body
-      const resClone = res.clone();
-      const data = await resClone.json();
+      // Use a direct fetch here instead of apiRequest to avoid response consumption issues
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ username, password }),
+        credentials: "include"
+      });
+      
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || `Login failed with status: ${res.status}`);
+      }
+      
+      const data = await res.json();
       setUser(data.user);
       
       toast({
@@ -106,7 +125,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       setError(null);
       
-      await apiRequest("POST", "/api/logout", {});
+      // Use direct fetch instead of apiRequest
+      const res = await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        credentials: "include"
+      });
+      
+      // Even if the request fails, we still want to log out locally
       setUser(null);
       
       toast({
