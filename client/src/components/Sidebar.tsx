@@ -33,13 +33,12 @@ export default function Sidebar() {
         </div>
         <h1 className="font-display font-bold text-xl text-primary-600">MediBridge</h1>
       </div>
-      
+
       <nav className="flex-grow">
         <ul className="space-y-1">
           {navItems.map((item) => (
             <li key={item.path}>
-              <Link href={item.path}>
-                <a className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg ${
+              <Link href={item.path} className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg ${
                   isActive(item.path) 
                     ? "bg-primary-50 text-primary-700" 
                     : "text-neutral-600 hover:bg-neutral-100 transition-colors"
@@ -48,13 +47,12 @@ export default function Sidebar() {
                   <span className={isActive(item.path) ? "font-medium" : ""}>
                     {item.label}
                   </span>
-                </a>
               </Link>
             </li>
           ))}
         </ul>
       </nav>
-      
+
       <div className="mt-auto pt-4 border-t border-neutral-200">
         <div className="bg-neutral-100 p-3 rounded-lg">
           <div className="flex items-center space-x-3 mb-2">
@@ -71,7 +69,7 @@ export default function Sidebar() {
             <span>Secure connection active</span>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-3 mt-4 px-2">
           <Avatar className="w-10 h-10">
             <AvatarImage src={user?.profileImage || ""} alt={user?.name || "User"} />
