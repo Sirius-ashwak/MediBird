@@ -77,7 +77,12 @@ export default function Sidebar() {
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm truncate">{user?.name || "Anonymous User"}</p>
-            <p className="text-xs text-neutral-500 truncate">ID: {user?.walletId?.substring(0, 6)}...{user?.walletId?.substring(user.walletId.length - 4)}</p>
+            <p className="text-xs text-neutral-500 truncate">
+              {user?.walletId ? 
+                `ID: ${user.walletId.substring(0, 6)}...${user.walletId.substring(user.walletId.length - 4)}` 
+                : "No Wallet ID"
+              }
+            </p>
           </div>
           <Button 
             variant="ghost" 

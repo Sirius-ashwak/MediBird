@@ -36,32 +36,35 @@ export default function LoginPage() {
     setRegistrationError("");
 
     try {
+      // Don't include walletId in registration - it will be auto-generated
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
           username: registerUsername,
           password: registerPassword,
           name: registerName,
-          email: registerEmail, // Added email to payload
-          walletId: registerWalletId, // Added walletId to payload
+          email: registerEmail
         }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Auto login after registration
-        const success = await login(registerUsername, registerPassword);
-        if (success) {
-          setLocation("/");
-        }
-      } else {
-        setRegistrationError(data.message);
+      if (!response.ok) {
+        const data = await response.json();
+        setRegistrationError(data.message || "Registration failed. Please try again.");
+        return;
+      }
+      
+      // Auto login after successful registration
+      const success = await login(registerUsername, registerPassword);
+      if (success) {
+        setLocation("/");
       }
     } catch (err) {
+      console.error("Registration error:", err);
       setRegistrationError("Registration failed. Please try again.");
     } finally {
       setRegistering(false);
@@ -191,16 +194,7 @@ export default function LoginPage() {
                             required
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="register-walletid">Wallet ID</Label>
-                          <Input
-                            id="register-walletid"
-                            placeholder="Enter your wallet ID"
-                            value={registerWalletId}
-                            onChange={(e) => setRegisterWalletId(e.target.value)}
-                            required
-                          />
-                        </div>
+                        {/* Wallet ID field removed since it's auto-generated */}
                       </div>
                       <Button className="w-full mt-6" type="submit" disabled={registering}>
                         {registering ? (
