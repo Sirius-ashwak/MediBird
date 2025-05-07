@@ -15,7 +15,8 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
+// Make a base insert schema
+const baseInsertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   name: true,
@@ -23,6 +24,11 @@ export const insertUserSchema = createInsertSchema(users).pick({
   walletId: true,
   profileImage: true,
   role: true,
+});
+
+// Create a modified version where walletId is optional
+export const insertUserSchema = baseInsertUserSchema.extend({
+  walletId: z.string().optional(),
 });
 
 // Medical record schema

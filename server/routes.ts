@@ -137,7 +137,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username already exists" });
       }
 
-      const walletId = await blockchain.createWallet();
+      // If walletId is not provided, generate one
+      const walletId = data.walletId || await blockchain.createWallet();
       const user = await storage.createUser({
         ...data,
         walletId: walletId,
