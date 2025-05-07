@@ -10,9 +10,13 @@ app.use(express.urlencoded({ extended: false }));
 // Serve static files from the public directory
 app.use(express.static(path.join(process.cwd(), "public")));
 
-// Route for serving the static index.html
+// Routes for serving static HTML files
 app.get('/', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+});
+
+app.get('/websocket-test', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'websocket-test.html'));
 });
 
 app.use((req, res, next) => {

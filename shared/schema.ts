@@ -35,6 +35,7 @@ export const medicalRecords = pgTable("medical_records", {
   provider: text("provider"),
   date: timestamp("date").defaultNow(),
   blockchainHash: text("blockchain_hash"),
+  blockchainTimestamp: timestamp("blockchain_timestamp"),
   verified: boolean("verified").default(false),
   data: jsonb("data"),
 });
@@ -47,6 +48,8 @@ export const insertMedicalRecordSchema = createInsertSchema(medicalRecords).pick
   provider: true,
   date: true,
   blockchainHash: true,
+  blockchainTimestamp: true,
+  verified: true,
   data: true,
 });
 
@@ -78,6 +81,8 @@ export const consents = pgTable("consents", {
   expiryDate: timestamp("expiry_date"),
   createdAt: timestamp("created_at").defaultNow(),
   active: boolean("active").default(false),
+  blockchainHash: text("blockchain_hash"),
+  blockchainTimestamp: timestamp("blockchain_timestamp"),
 });
 
 export const insertConsentSchema = createInsertSchema(consents).pick({
@@ -87,6 +92,8 @@ export const insertConsentSchema = createInsertSchema(consents).pick({
   dataType: true,
   expiryDate: true,
   active: true,
+  blockchainHash: true,
+  blockchainTimestamp: true,
 });
 
 // AI conversation schema
@@ -123,20 +130,20 @@ export const insertAiMessageSchema = createInsertSchema(aiMessages).pick({
 // Blockchain verification logs
 export const blockchainLogs = pgTable("blockchain_logs", {
   id: serial("id").primaryKey(),
-  recordType: text("record_type").notNull(), // medical_record, consent, provider
-  recordId: integer("record_id").notNull(),
+  userId: integer("user_id").notNull(),
+  operation: text("operation").notNull(), // STORE_RECORD, VERIFY_RECORD, CREATE_WALLET, STORE_CONSENT, etc
   transactionHash: text("transaction_hash").notNull(),
-  status: text("status").notNull(), // pending, verified, failed
-  timestamp: timestamp("timestamp").defaultNow(),
-  details: jsonb("details"),
+  details: text("details"),
+  status: text("status").notNull(), // completed, pending, failed
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertBlockchainLogSchema = createInsertSchema(blockchainLogs).pick({
-  recordType: true,
-  recordId: true,
+  userId: true,
+  operation: true,
   transactionHash: true,
-  status: true,
   details: true,
+  status: true,
 });
 
 // Appointments

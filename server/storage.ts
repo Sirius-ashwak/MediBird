@@ -43,6 +43,7 @@ export interface IStorage {
 
   // Consent methods
   getUserConsents(userId: number): Promise<DataAccessProvider[]>;
+  getConsent(id: number): Promise<Consent | undefined>;
   createConsent(consent: InsertConsent): Promise<Consent>;
   updateConsent(id: number, data: Partial<Consent>): Promise<Consent>;
   checkConsent(recordId: number, userId: number): Promise<boolean>;
@@ -204,6 +205,8 @@ export class MemStorage implements IStorage {
         expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         createdAt: new Date(),
         active: true,
+        blockchainHash: "0xD9eG7e43F8gF4c4d7bE6h1j2K6M8N9P",
+        blockchainTimestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
       },
       {
         id: this.currentIds.consents++,
@@ -214,6 +217,8 @@ export class MemStorage implements IStorage {
         expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
         createdAt: new Date(),
         active: true,
+        blockchainHash: "0xE8fH6g43F8gF4c4d7bE6h1j2K6M8N9Q",
+        blockchainTimestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
       },
       {
         id: this.currentIds.consents++,
@@ -224,6 +229,8 @@ export class MemStorage implements IStorage {
         expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         createdAt: new Date(),
         active: false,
+        blockchainHash: null,
+        blockchainTimestamp: null
       },
     ];
 
@@ -242,6 +249,7 @@ export class MemStorage implements IStorage {
         provider: "Northwest Medical Center",
         date: new Date(2023, 6, 15), // July 15, 2023
         blockchainHash: "0x72F934B2a7c8D5e6F3g4H5i6J7k8L9m",
+        blockchainTimestamp: new Date(2023, 6, 16), // Added a day after the record
         verified: true,
         data: {
           results: {
@@ -263,6 +271,7 @@ export class MemStorage implements IStorage {
         provider: "City Hospital",
         date: new Date(2023, 5, 22), // June 22, 2023
         blockchainHash: "0x58A12FD7b8C9d0E1f2G3h4I5j6K7l8",
+        blockchainTimestamp: new Date(2023, 5, 23), // Added a day after the record
         verified: true,
         data: {
           findings: "No significant abnormalities detected.",
@@ -278,6 +287,7 @@ export class MemStorage implements IStorage {
         provider: "Dr. Emily Chen",
         date: new Date(2023, 5, 15), // June 15, 2023
         blockchainHash: "0x31C79AF4c5D6e7F8g9H0i1J2k3L4m5",
+        blockchainTimestamp: new Date(2023, 5, 15), // Same day as the prescription was issued
         verified: true,
         data: {
           dosage: "500mg",
@@ -361,30 +371,48 @@ export class MemStorage implements IStorage {
     const blockchainLogs: BlockchainLog[] = [
       {
         id: this.currentIds.blockchainLogs++,
-        recordType: "medical_record",
-        recordId: 1,
+        userId: user.id,
+        operation: "STORE_RECORD",
         transactionHash: "0x72F934B2a7c8D5e6F3g4H5i6J7k8L9m",
-        status: "verified",
-        timestamp: new Date(),
-        details: { type: "lab", title: "Complete Blood Count (CBC)" },
+        status: "completed",
+        createdAt: new Date(2023, 6, 16),
+        details: "Stored medical record: Complete Blood Count (CBC)",
       },
       {
         id: this.currentIds.blockchainLogs++,
-        recordType: "medical_record",
-        recordId: 2,
+        userId: user.id,
+        operation: "STORE_RECORD",
         transactionHash: "0x58A12FD7b8C9d0E1f2G3h4I5j6K7l8",
-        status: "verified",
-        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-        details: { type: "imaging", title: "Chest X-Ray" },
+        status: "completed",
+        createdAt: new Date(2023, 5, 23),
+        details: "Stored medical record: Chest X-Ray",
       },
       {
         id: this.currentIds.blockchainLogs++,
-        recordType: "medical_record",
-        recordId: 3,
+        userId: user.id,
+        operation: "STORE_RECORD",
         transactionHash: "0x31C79AF4c5D6e7F8g9H0i1J2k3L4m5",
-        status: "verified",
-        timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-        details: { type: "prescription", title: "Amoxicillin 500mg" },
+        status: "completed",
+        createdAt: new Date(2023, 5, 15),
+        details: "Stored medical record: Amoxicillin 500mg",
+      },
+      {
+        id: this.currentIds.blockchainLogs++,
+        userId: user.id,
+        operation: "STORE_CONSENT",
+        transactionHash: "0xD9eG7e43F8gF4c4d7bE6h1j2K6M8N9P",
+        status: "completed",
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        details: "Stored consent for provider ID 1",
+      },
+      {
+        id: this.currentIds.blockchainLogs++,
+        userId: user.id,
+        operation: "CREATE_WALLET",
+        transactionHash: "0xABC123DEF456GHI789JKL0MNOP",
+        status: "completed",
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        details: "Created new Polkadot wallet address",
       },
     ];
 
@@ -527,6 +555,10 @@ export class MemStorage implements IStorage {
   }
 
   // Consent methods
+  async getConsent(id: number): Promise<Consent | undefined> {
+    return this.consents.get(id);
+  }
+  
   async getUserConsents(userId: number): Promise<DataAccessProvider[]> {
     const userConsents = Array.from(this.consents.values()).filter(
       (consent) => consent.userId === userId,
@@ -663,9 +695,13 @@ export class MemStorage implements IStorage {
 
   // Blockchain log methods
   async getBlockchainLogs(userId: number): Promise<BlockchainLog[]> {
-    // For now, return all logs since we don't track which user they belong to directly
-    // In a real application, we would filter by records owned by the user
-    return Array.from(this.blockchainLogs.values());
+    return Array.from(this.blockchainLogs.values())
+      .filter(log => log.userId === userId)
+      .sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+        return dateB - dateA; // Sort by most recent first
+      });
   }
 
   async createBlockchainLog(insertLog: InsertBlockchainLog): Promise<BlockchainLog> {
@@ -673,7 +709,7 @@ export class MemStorage implements IStorage {
     const log: BlockchainLog = { 
       ...insertLog, 
       id,
-      timestamp: new Date(),
+      createdAt: new Date(),
     };
     this.blockchainLogs.set(id, log);
     return log;

@@ -43,6 +43,12 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
               <span className="text-xs mt-1">Consult</span>
             </a>
           </Link>
+          <Link href="/transactions">
+            <a className={`flex flex-col items-center py-1 px-3 ${isActive("/transactions") ? "text-primary-600" : "text-neutral-500"}`}>
+              <ExchangeIcon className="text-xl" />
+              <span className="text-xs mt-1">Blockchain</span>
+            </a>
+          </Link>
           <Link href="/consent">
             <a className={`flex flex-col items-center py-1 px-3 ${isActive("/consent") ? "text-primary-600" : "text-neutral-500"}`}>
               <LockIcon className="text-xl" />

@@ -486,6 +486,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Server error" });
     }
   });
+  
+  // Get blockchain network information
+  app.get("/api/blockchain/info", async (req, res) => {
+    try {
+      const blockchainInfo = await blockchain.getBlockchainInfo();
+      res.json(blockchainInfo);
+    } catch (err) {
+      console.error("Error retrieving blockchain information:", err);
+      res.status(500).json({ 
+        message: "Failed to retrieve blockchain information",
+        error: (err as Error).message,
+        connected: false,
+        simulationMode: true
+      });
+    }
+  });
+  
+  // Create a new blockchain wallet
+  app.post("/api/blockchain/wallet", requireAuth, async (req: any, res) => {
+    try {
+      const walletAddress = await blockchain.createWallet();
+      
+      // Record this activity
+      await storage.createActivity({
+        userId: req.user.id,
+        type: "blockchain_wallet_created",
+        title: "Blockchain Wallet Created",
+        description: `New Polkadot wallet created with address ${walletAddress.substring(0, 10)}...`,
+        metadata: { walletAddress },
+      });
+      
+      // Log this in blockchain logs
+      await storage.createBlockchainLog({
+        userId: req.user.id,
+        operation: "CREATE_WALLET",
+        transactionHash: walletAddress,
+        details: "Created new Polkadot wallet address",
+        status: "completed"
+      });
+      
+      res.json({ 
+        address: walletAddress,
+        created: true,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Error creating blockchain wallet:", err);
+      res.status(500).json({ 
+        message: "Failed to create blockchain wallet",
+        error: (err as Error).message
+      });
+    }
+  });
+
+  // Store medical record on blockchain
+  app.post("/api/blockchain/store/:recordId", requireAuth, async (req: any, res) => {
+    try {
+      const recordId = parseInt(req.params.recordId);
+      const record = await storage.getMedicalRecord(recordId);
+      
+      if (!record) {
+        return res.status(404).json({ message: "Record not found" });
+      }
+
+      if (record.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to store this record" });
+      }
+      
+      // Check if record is already on blockchain
+      if (record.blockchainHash) {
+        return res.status(400).json({ 
+          message: "Record is already stored on blockchain",
+          transactionHash: record.blockchainHash
+        });
+      }
+      
+      // Create record data for blockchain
+      const blockchainRecord = {
+        type: record.type,
+        title: record.title,
+        userId: record.userId,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Store record on blockchain
+      const transactionHash = await blockchain.storeRecord(blockchainRecord);
+      
+      // Update record with blockchain hash
+      await storage.updateMedicalRecord(recordId, { 
+        blockchainHash: transactionHash,
+        blockchainTimestamp: new Date(),
+        verified: true
+      });
+      
+      // Log this blockchain transaction
+      await storage.createBlockchainLog({
+        userId: req.user.id,
+        operation: "STORE_RECORD",
+        transactionHash,
+        details: `Stored medical record: ${record.title}`,
+        status: "completed"
+      });
+      
+      // Record activity
+      await storage.createActivity({
+        userId: req.user.id,
+        type: "blockchain_record_stored",
+        title: "Medical Record Stored on Blockchain",
+        description: `${record.title} has been securely stored on the blockchain`,
+        metadata: { recordId, transactionHash },
+      });
+      
+      res.json({ 
+        stored: true, 
+        recordId, 
+        transactionHash,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Error storing record on blockchain:", err);
+      res.status(500).json({ 
+        message: "Error storing record on blockchain",
+        error: (err as Error).message,
+      });
+    }
+  });
+  
+  // Store consent on blockchain
+  app.post("/api/blockchain/consent/:consentId", requireAuth, async (req: any, res) => {
+    try {
+      const consentId = parseInt(req.params.consentId);
+      const consent = await storage.getConsent(consentId);
+      
+      if (!consent) {
+        return res.status(404).json({ message: "Consent record not found" });
+      }
+
+      if (consent.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to store this consent" });
+      }
+      
+      // Create consent data for blockchain
+      const blockchainConsent = {
+        userId: consent.userId,
+        providerId: consent.providerId,
+        dataType: consent.dataType,
+        status: consent.status,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Store consent on blockchain
+      const transactionHash = await blockchain.storeConsent(blockchainConsent);
+      
+      // Update consent with blockchain hash
+      await storage.updateConsent(consentId, { 
+        blockchainHash: transactionHash,
+        blockchainTimestamp: new Date()
+      });
+      
+      // Log this blockchain transaction
+      await storage.createBlockchainLog({
+        userId: req.user.id,
+        operation: "STORE_CONSENT",
+        transactionHash,
+        details: `Stored consent for provider ID ${consent.providerId}`,
+        status: "completed"
+      });
+      
+      // Record activity
+      await storage.createActivity({
+        userId: req.user.id,
+        type: "blockchain_consent_stored",
+        title: "Consent Stored on Blockchain",
+        description: `Consent for provider access has been secured on the blockchain`,
+        metadata: { consentId, transactionHash },
+      });
+      
+      res.json({ 
+        stored: true, 
+        consentId, 
+        transactionHash,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Error storing consent on blockchain:", err);
+      res.status(500).json({ 
+        message: "Error storing consent on blockchain",
+        error: (err as Error).message,
+      });
+    }
+  });
 
   app.post("/api/blockchain/verify/:recordId", requireAuth, async (req: any, res) => {
     try {

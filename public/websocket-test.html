@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediBridge WebSocket Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      background-color: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2563eb;
+      margin-top: 0;
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #ef4444;
+      margin-right: 10px;
+    }
+    .status-indicator.connected {
+      background-color: #10b981;
+    }
+    .message-container {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 15px;
+      background-color: white;
+    }
+    .message {
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+    .server-message {
+      background-color: #e0f2fe;
+      border-left: 3px solid #0ea5e9;
+    }
+    .client-message {
+      background-color: #dcfce7;
+      border-left: 3px solid #10b981;
+    }
+    .error-message {
+      background-color: #fee2e2;
+      border-left: 3px solid #ef4444;
+    }
+    .controls {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    input {
+      flex-grow: 1;
+      padding: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:disabled {
+      background-color: #93c5fd;
+      cursor: not-allowed;
+    }
+    button.disconnect {
+      background-color: #6b7280;
+    }
+    button.disconnect:hover {
+      background-color: #4b5563;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    .info {
+      background-color: #eff6ff;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    .timestamp {
+      font-size: 12px;
+      color: #6b7280;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MediBridge WebSocket Test</h1>
+    
+    <div class="status">
+      <div id="status-indicator" class="status-indicator"></div>
+      <span id="status-text">Disconnected</span>
+    </div>
+    
+    <div id="messages" class="message-container"></div>
+    
+    <div class="controls">
+      <input 
+        id="message-input" 
+        type="text" 
+        placeholder="Type a message..." 
+        disabled
+      />
+      <button id="send-button" disabled>Send</button>
+    </div>
+    
+    <div>
+      <button id="connect-button">Connect</button>
+      <button id="disconnect-button" class="disconnect" disabled>Disconnect</button>
+    </div>
+    
+    <div class="info">
+      <p><strong>Connection Details:</strong></p>
+      <p id="connection-url">WebSocket URL: Will be displayed after connection attempt</p>
+      <p><strong>Test Instructions:</strong></p>
+      <ol>
+        <li>Click "Connect" to establish a WebSocket connection</li>
+        <li>Once connected, you can send messages</li>
+        <li>The server should echo back your messages or respond with updates</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const statusIndicator = document.getElementById('status-indicator');
+      const statusText = document.getElementById('status-text');
+      const messagesContainer = document.getElementById('messages');
+      const messageInput = document.getElementById('message-input');
+      const sendButton = document.getElementById('send-button');
+      const connectButton = document.getElementById('connect-button');
+      const disconnectButton = document.getElementById('disconnect-button');
+      const connectionUrl = document.getElementById('connection-url');
+      
+      let socket = null;
+      
+      function updateConnectionStatus(isConnected, message = null) {
+        if (isConnected) {
+          statusIndicator.classList.add('connected');
+          statusText.textContent = message || 'Connected';
+          messageInput.disabled = false;
+          sendButton.disabled = false;
+          connectButton.disabled = true;
+          disconnectButton.disabled = false;
+        } else {
+          statusIndicator.classList.remove('connected');
+          statusText.textContent = message || 'Disconnected';
+          messageInput.disabled = true;
+          sendButton.disabled = true;
+          connectButton.disabled = false;
+          disconnectButton.disabled = true;
+        }
+      }
+      
+      function addMessage(content, type) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(`${type}-message`);
+        
+        const timestamp = new Date().toLocaleTimeString();
+        messageElement.innerHTML = `${content}<span class="timestamp">${timestamp}</span>`;
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+      
+      connectButton.addEventListener('click', () => {
+        try {
+          // Construct WebSocket URL with the correct protocol and hostname
+          const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+          const host = window.location.hostname;
+          const port = '5000'; // MediBridge server port
+          const wsUrl = `${protocol}//${host}:${port}/ws`;
+          
+          connectionUrl.textContent = `WebSocket URL: ${wsUrl}`;
+          addMessage(`Attempting to connect to ${wsUrl}...`, 'client');
+          
+          socket = new WebSocket(wsUrl);
+          
+          socket.addEventListener('open', () => {
+            updateConnectionStatus(true);
+            addMessage('Connection established!', 'server');
+            
+            // Send authentication message
+            const authMessage = {
+              type: 'auth',
+              userId: 1 // Demo user ID
+            };
+            socket.send(JSON.stringify(authMessage));
+          });
+          
+          socket.addEventListener('message', (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              addMessage(`Received: ${JSON.stringify(data)}`, 'server');
+            } catch (e) {
+              addMessage(`Received: ${event.data}`, 'server');
+            }
+          });
+          
+          socket.addEventListener('error', (error) => {
+            updateConnectionStatus(false, 'Error');
+            addMessage(`WebSocket error: ${error.message || 'Unknown error'}`, 'error');
+          });
+          
+          socket.addEventListener('close', (event) => {
+            updateConnectionStatus(false);
+            addMessage(`Connection closed. Code: ${event.code}, Reason: ${event.reason || 'No reason provided'}`, 'server');
+          });
+        } catch (error) {
+          updateConnectionStatus(false, 'Error');
+          addMessage(`Failed to connect: ${error.message}`, 'error');
+        }
+      });
+      
+      disconnectButton.addEventListener('click', () => {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.close();
+          addMessage('Disconnected from server', 'client');
+        }
+      });
+      
+      sendButton.addEventListener('click', sendMessage);
+      
+      messageInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+          sendMessage();
+        }
+      });
+      
+      function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          try {
+            const messageObj = {
+              type: 'medical_update',
+              content: message,
+              timestamp: new Date().toISOString()
+            };
+            
+            socket.send(JSON.stringify(messageObj));
+            addMessage(`Sent: ${message}`, 'client');
+            messageInput.value = '';
+          } catch (error) {
+            addMessage(`Failed to send message: ${error.message}`, 'error');
+          }
+        } else {
+          addMessage('Cannot send message: WebSocket is not connected', 'error');
+        }
+      }
+      
+      // Initialize with disconnected state
+      updateConnectionStatus(false);
+    });
+  </script>
+</body>
+</html>
