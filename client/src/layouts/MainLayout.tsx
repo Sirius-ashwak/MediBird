@@ -3,8 +3,9 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import MobileNav from "@/components/MobileNav";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu, X } from "lucide-react";
 import { useLocation } from "wouter";
+import { PulseIcon } from "@/lib/icons";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -56,7 +57,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <i className="ri-pulse-line text-white text-lg"></i>
+              <PulseIcon className="text-white text-lg" />
             </div>
             <h1 className="font-display font-bold text-lg text-primary-600">MediBridge</h1>
           </div>
@@ -64,7 +65,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             onClick={() => setMobileMenuOpen(true)}
             className="p-2 rounded-lg hover:bg-neutral-100"
           >
-            <i className="ri-menu-line text-xl"></i>
+            <Menu className="h-6 w-6" />
           </button>
         </div>
       </div>
@@ -77,7 +78,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               onClick={() => setMobileMenuOpen(false)}
               className="absolute top-4 right-4 p-1 rounded-lg hover:bg-neutral-100"
             >
-              <i className="ri-close-line text-xl"></i>
+              <X className="h-6 w-6" />
             </button>
             <MobileNav onClose={() => setMobileMenuOpen(false)} />
           </div>

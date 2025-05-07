@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Link } from "wouter";
 
 interface StatsCardProps {
   title: string;
@@ -56,7 +57,7 @@ export default function StatsCard({
       
       {link && (
         <div className="flex items-center mt-3 text-xs">
-          <a href={link.href} className="text-primary-600 font-medium">{link.label}</a>
+          <Link href={link.href} className="text-primary-600 font-medium">{link.label}</Link>
           <i className="ri-arrow-right-s-line text-primary-600 ml-1"></i>
         </div>
       )}

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity } from "@shared/schema";
+import { RiFileTextLine, RiExchangeLine, RiTimerLine, RiShieldCheckLine, RiLockLine, RiAiGenerate } from 'react-icons/ri';
 
 export default function MedicalActivity() {
   const { data: activities, isLoading } = useQuery({
@@ -16,7 +17,9 @@ export default function MedicalActivity() {
         <CardTitle className="text-lg">Recent Medical Activity</CardTitle>
         <Button variant="link" size="sm" className="text-primary-600">
           View all
-          <i className="ri-arrow-right-s-line ml-1"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" className="ml-1">
+            <path fill="currentColor" d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"/>
+          </svg>
         </Button>
       </CardHeader>
       <CardContent>
@@ -105,11 +108,39 @@ function ActivityItem({
   badge, 
   actionText 
 }: ActivityItemProps) {
+  // Render the appropriate icon based on the icon name
+  const renderIcon = () => {
+    switch(icon) {
+      case 'ri-file-text-line':
+        return <RiFileTextLine className={iconColor} size={20} />;
+      case 'ri-exchange-line':
+        return <RiExchangeLine className={iconColor} size={20} />;
+      case 'ri-ai-generate':
+        return <RiAiGenerate className={iconColor} size={20} />;
+      default:
+        return <RiFileTextLine className={iconColor} size={20} />;
+    }
+  };
+
+  // Render the badge icon
+  const renderBadgeIcon = () => {
+    switch(badge.icon) {
+      case 'ri-lock-line':
+        return <RiLockLine size={14} />;
+      case 'ri-timer-line':
+        return <RiTimerLine size={14} />;
+      case 'ri-shield-check-line':
+        return <RiShieldCheckLine size={14} />;
+      default:
+        return null;
+    }
+  };
+  
   return (
     <div className="border-b border-neutral-100 pb-4 last:border-b-0 last:pb-0">
       <div className="flex items-center space-x-3">
         <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}>
-          <i className={`${icon} ${iconColor}`}></i>
+          {renderIcon()}
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
@@ -119,7 +150,7 @@ function ActivityItem({
           <p className="text-sm text-neutral-600">{description}</p>
           <div className="flex items-center mt-1">
             <div className={`flex items-center space-x-1 ${badge.color} px-2 py-0.5 rounded text-xs`}>
-              <i className={badge.icon}></i>
+              {renderBadgeIcon()}
               <span>{badge.text}</span>
             </div>
             <Button variant="link" size="sm" className="ml-3 text-xs text-primary-600 p-0 h-auto">{actionText}</Button>

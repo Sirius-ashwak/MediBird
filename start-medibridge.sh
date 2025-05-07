@@ -1,8 +1,12 @@
 #!/bin/bash
-# MediBridge Startup Script
+# Start script for MediBridge application
 
-echo "Starting MediBridge Healthcare Platform..."
-echo "Initializing blockchain and smart contracts..."
+echo "Starting MediBridge application..."
 
-# Start the server
-npm run dev
+# Set environment variables
+export PORT=5000
+export NODE_ENV=development
+export GOOGLE_API_KEY=AIzaSyAgev0-OnF9IKw_pdiJFZnmOLwjV1i0VjI
+
+# Start the combined server with Vite frontend + Express backend
+node --inspect server/index.ts

@@ -29,29 +29,21 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
             <DashboardIcon className="text-xl" />
             <span className="text-xs mt-1">Dashboard</span>
           </Link>
-          <Link href="/records">
-            <a className={`flex flex-col items-center py-1 px-3 ${isActive("/records") ? "text-primary-600" : "text-neutral-500"}`}>
+          <Link href="/records" className={`flex flex-col items-center py-1 px-3 ${isActive("/records") ? "text-primary-600" : "text-neutral-500"}`}>
               <FileListIcon className="text-xl" />
               <span className="text-xs mt-1">Records</span>
-            </a>
           </Link>
-          <Link href="/consultations">
-            <a className={`flex flex-col items-center py-1 px-3 ${isActive("/consultations") ? "text-primary-600" : "text-neutral-500"}`}>
+          <Link href="/consultations" className={`flex flex-col items-center py-1 px-3 ${isActive("/consultations") ? "text-primary-600" : "text-neutral-500"}`}>
               <UserVoiceIcon className="text-xl" />
               <span className="text-xs mt-1">Consult</span>
-            </a>
           </Link>
-          <Link href="/transactions">
-            <a className={`flex flex-col items-center py-1 px-3 ${isActive("/transactions") ? "text-primary-600" : "text-neutral-500"}`}>
+          <Link href="/transactions" className={`flex flex-col items-center py-1 px-3 ${isActive("/transactions") ? "text-primary-600" : "text-neutral-500"}`}>
               <ExchangeIcon className="text-xl" />
               <span className="text-xs mt-1">Blockchain</span>
-            </a>
           </Link>
-          <Link href="/consent">
-            <a className={`flex flex-col items-center py-1 px-3 ${isActive("/consent") ? "text-primary-600" : "text-neutral-500"}`}>
+          <Link href="/consent" className={`flex flex-col items-center py-1 px-3 ${isActive("/consent") ? "text-primary-600" : "text-neutral-500"}`}>
               <LockIcon className="text-xl" />
               <span className="text-xs mt-1">Privacy</span>
-            </a>
           </Link>
         </div>
       </div>
@@ -83,20 +75,19 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
         <ul className="space-y-1">
           {navItems.map((item) => (
             <li key={item.path}>
-              <Link href={item.path}>
-                <a 
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg ${
-                    isActive(item.path) 
-                      ? "bg-primary-50 text-primary-700" 
-                      : "text-neutral-600 hover:bg-neutral-100 transition-colors"
-                  }`}
-                  onClick={onClose}
-                >
-                  {item.icon}
-                  <span className={isActive(item.path) ? "font-medium" : ""}>
-                    {item.label}
-                  </span>
-                </a>
+              <Link 
+                href={item.path}
+                className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg ${
+                  isActive(item.path) 
+                    ? "bg-primary-50 text-primary-700" 
+                    : "text-neutral-600 hover:bg-neutral-100 transition-colors"
+                }`}
+                onClick={onClose}
+              >
+                {item.icon}
+                <span className={isActive(item.path) ? "font-medium" : ""}>
+                  {item.label}
+                </span>
               </Link>
             </li>
           ))}
