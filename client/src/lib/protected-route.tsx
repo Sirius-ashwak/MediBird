@@ -11,6 +11,7 @@ export function ProtectedRoute({
 }) {
   const { isAuthenticated, loading } = useAuth();
 
+  // Display a loading spinner while checking authentication
   if (loading) {
     return (
       <Route path={path}>
@@ -22,6 +23,7 @@ export function ProtectedRoute({
     );
   }
 
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return (
       <Route path={path}>
@@ -30,12 +32,15 @@ export function ProtectedRoute({
     );
   }
 
-  // Support both exact and nested paths
-  // This ensures "/", "/records", etc. all work properly
-  return (
-    <>
+  // Handle route depending on whether it's the root path or not
+  if (path === "/") {
+    return (
       <Route path={path} component={Component} />
-      <Route path={`${path}/*`} component={Component} />
-    </>
+    );
+  }
+
+  // For non-root paths, handle both the exact path and any child routes
+  return (
+    <Route path={path} component={Component} />
   );
 }

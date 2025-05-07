@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,33 +13,82 @@ import BlockchainLogs from "@/pages/BlockchainLogs";
 import WebSocketDemo from "@/pages/WebSocketDemo";
 import MainLayout from "@/layouts/MainLayout";
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import LoginPage from "@/pages/login-page";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { Loader2 } from "lucide-react";
 
 function Router() {
-  const ProtectedLayout = () => (
-    <MainLayout>
-      <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/records" component={MedicalRecords} />
-        <Route path="/consultations" component={AIConsultations} />
-        <Route path="/consent" component={ConsentManagement} />
-        <Route path="/providers" component={Providers} />
-        <Route path="/transactions" component={BlockchainLogs} />
-        <Route path="/websocket" component={WebSocketDemo} />
-        <Route component={NotFound} />
-      </Switch>
-    </MainLayout>
-  );
+  const { isAuthenticated, loading } = useAuth();
+  const [location] = useLocation();
+  
+  // Render a direct app with routes for authenticated users
+  const renderApp = () => {
+    return (
+      <MainLayout>
+        <Switch>
+          <Route path="/">
+            <Dashboard />
+          </Route>
+          <Route path="/records">
+            <MedicalRecords />
+          </Route>
+          <Route path="/consultations">
+            <AIConsultations />
+          </Route>
+          <Route path="/consent">
+            <ConsentManagement />
+          </Route>
+          <Route path="/providers">
+            <Providers />
+          </Route>
+          <Route path="/transactions">
+            <BlockchainLogs />
+          </Route>
+          <Route path="/websocket">
+            <WebSocketDemo />
+          </Route>
+          <Route>
+            <NotFound />
+          </Route>
+        </Switch>
+      </MainLayout>
+    );
+  };
 
-  return (
-    <Switch>
-      <Route path="/auth" component={LoginPage} />
-      <Route path="/login" component={LoginPage} /> {/* Add an alias to support both paths */}
-      <ProtectedRoute path="/" component={ProtectedLayout} />
-    </Switch>
-  );
+  // Display loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+        <span className="ml-2 text-primary-600">Loading MediBridge...</span>
+      </div>
+    );
+  }
+
+  // Public routes
+  if (!isAuthenticated) {
+    if (location !== "/login" && location !== "/auth") {
+      return <Redirect to="/login" />;
+    }
+    
+    return (
+      <Switch>
+        <Route path="/login">
+          <LoginPage />
+        </Route>
+        <Route path="/auth">
+          <LoginPage />
+        </Route>
+        <Route path="*">
+          <Redirect to="/login" />
+        </Route>
+      </Switch>
+    );
+  }
+
+  // Protected routes - only for authenticated users
+  return renderApp();
 }
 
 function App() {

@@ -14,9 +14,9 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { loading, isAuthenticated } = useAuth();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated - only once when component mounts
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       console.log("User not authenticated, redirecting to login");
@@ -24,14 +24,16 @@ export default function MainLayout({ children }: MainLayoutProps) {
     }
   }, [loading, isAuthenticated, setLocation]);
 
-  // No need for periodic refreshes that can interrupt navigation
-  // The auth context will handle session tracking
+  // Log current location for debugging
+  useEffect(() => {
+    console.log("Current location:", location);
+  }, [location]);
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Loading MediBridge...</span>
+      <div className="h-screen w-full flex items-center justify-center bg-white">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+        <span className="ml-2 text-primary-600">Loading MediBridge...</span>
       </div>
     );
   }

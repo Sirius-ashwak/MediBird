@@ -26,25 +26,45 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
     return (
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 p-2">
         <div className="flex justify-around">
-          <Link href="/" className={`flex flex-col items-center py-1 px-3 ${isActive("/") ? "text-primary-600" : "text-neutral-500"}`}>
+          <Link 
+            href="/" 
+            onClick={() => {}}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/") ? "text-primary-600" : "text-neutral-500"}`}
+          >
             <DashboardIcon className="text-xl" />
             <span className="text-xs mt-1">Dashboard</span>
           </Link>
-          <Link href="/records" className={`flex flex-col items-center py-1 px-3 ${isActive("/records") ? "text-primary-600" : "text-neutral-500"}`}>
-              <FileListIcon className="text-xl" />
-              <span className="text-xs mt-1">Records</span>
+          <Link 
+            href="/records" 
+            onClick={() => {}}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/records") ? "text-primary-600" : "text-neutral-500"}`}
+          >
+            <FileListIcon className="text-xl" />
+            <span className="text-xs mt-1">Records</span>
           </Link>
-          <Link href="/consultations" className={`flex flex-col items-center py-1 px-3 ${isActive("/consultations") ? "text-primary-600" : "text-neutral-500"}`}>
-              <UserVoiceIcon className="text-xl" />
-              <span className="text-xs mt-1">Consult</span>
+          <Link 
+            href="/consultations" 
+            onClick={() => {}}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/consultations") ? "text-primary-600" : "text-neutral-500"}`}
+          >
+            <UserVoiceIcon className="text-xl" />
+            <span className="text-xs mt-1">Consult</span>
           </Link>
-          <Link href="/transactions" className={`flex flex-col items-center py-1 px-3 ${isActive("/transactions") ? "text-primary-600" : "text-neutral-500"}`}>
-              <ExchangeIcon className="text-xl" />
-              <span className="text-xs mt-1">Blockchain</span>
+          <Link 
+            href="/transactions" 
+            onClick={() => {}}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/transactions") ? "text-primary-600" : "text-neutral-500"}`}
+          >
+            <ExchangeIcon className="text-xl" />
+            <span className="text-xs mt-1">Blockchain</span>
           </Link>
-          <Link href="/consent" className={`flex flex-col items-center py-1 px-3 ${isActive("/consent") ? "text-primary-600" : "text-neutral-500"}`}>
-              <LockIcon className="text-xl" />
-              <span className="text-xs mt-1">Privacy</span>
+          <Link 
+            href="/consent" 
+            onClick={() => {}}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/consent") ? "text-primary-600" : "text-neutral-500"}`}
+          >
+            <LockIcon className="text-xl" />
+            <span className="text-xs mt-1">Privacy</span>
           </Link>
         </div>
       </div>
