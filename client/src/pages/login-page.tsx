@@ -16,7 +16,6 @@ export default function LoginPage() {
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerUsername, setRegisterUsername] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
-  const [registerWalletId, setRegisterWalletId] = useState(""); // Added walletId state
   const { login, loading, error } = useAuth();
   const [, setLocation] = useLocation();
   const [registrationError, setRegistrationError] = useState("");
@@ -36,7 +35,22 @@ export default function LoginPage() {
     setRegistrationError("");
 
     try {
-      // Don't include walletId in registration - it will be auto-generated
+      // First create a wallet
+      const walletResponse = await fetch("/api/blockchain/wallet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include"
+      });
+
+      if (!walletResponse.ok) {
+        throw new Error("Failed to create blockchain wallet");
+      }
+
+      const { address: walletId } = await walletResponse.json();
+
+      // Then register with the wallet ID
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
@@ -48,14 +62,14 @@ export default function LoginPage() {
           username: registerUsername,
           password: registerPassword,
           name: registerName,
-          email: registerEmail
+          email: registerEmail,
+          walletId
         }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        setRegistrationError(data.message || "Registration failed. Please try again.");
-        return;
+        throw new Error(data.message || "Registration failed");
       }
       
       // Auto login after successful registration
@@ -65,7 +79,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Registration error:", err);
-      setRegistrationError("Registration failed. Please try again.");
+      setRegistrationError(err instanceof Error ? err.message : "Registration failed. Please try again.");
     } finally {
       setRegistering(false);
     }
@@ -194,7 +208,6 @@ export default function LoginPage() {
                             required
                           />
                         </div>
-                        {/* Wallet ID field removed since it's auto-generated */}
                       </div>
                       <Button className="w-full mt-6" type="submit" disabled={registering}>
                         {registering ? (

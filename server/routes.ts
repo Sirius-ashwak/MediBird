@@ -137,19 +137,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username already exists" });
       }
 
-      // If walletId is not provided, generate one
-      const walletId = data.walletId || await blockchain.createWallet();
+      if (!data.walletId) {
+        return res.status(400).json({ message: "Wallet ID is required for registration" });
+      }
+
       const user = await storage.createUser({
         ...data,
-        walletId: walletId,
+        walletId: data.walletId,
       });
 
       // Create default health profile
       await storage.createHealthProfile({
         userId: user.id,
-        patientId: `#${Math.floor(1000000 + Math.random() * 9000000)}`, // Generate random patient ID
+        patientId: `#${Math.floor(1000000 + Math.random() * 9000000)}`,
         gender: "Unknown",
         age: 0,
+      });
+
+      // Record this activity
+      await storage.createActivity({
+        userId: user.id,
+        type: "user_registered",
+        title: "New User Registration",
+        description: `Account created for ${user.name}`,
+        metadata: { username: user.username },
       });
 
       req.login(user, (err) => {
@@ -541,27 +552,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create a new blockchain wallet
-  app.post("/api/blockchain/wallet", requireAuth, async (req: any, res) => {
+  app.post("/api/blockchain/wallet", async (req: any, res) => {
     try {
       const walletAddress = await blockchain.createWallet();
       
-      // Record this activity
-      await storage.createActivity({
-        userId: req.user.id,
-        type: "blockchain_wallet_created",
-        title: "Blockchain Wallet Created",
-        description: `New Polkadot wallet created with address ${walletAddress.substring(0, 10)}...`,
-        metadata: { walletAddress },
-      });
-      
-      // Log this in blockchain logs
-      await storage.createBlockchainLog({
-        userId: req.user.id,
-        operation: "CREATE_WALLET",
-        transactionHash: walletAddress,
-        details: "Created new Polkadot wallet address",
-        status: "completed"
-      });
+      // If user is authenticated, record the activity
+      if (req.isAuthenticated() && req.user) {
+        // Record this activity
+        await storage.createActivity({
+          userId: req.user.id,
+          type: "blockchain_wallet_created",
+          title: "Blockchain Wallet Created",
+          description: `New Polkadot wallet created with address ${walletAddress.substring(0, 10)}...`,
+          metadata: { walletAddress },
+        });
+        
+        // Log this in blockchain logs
+        await storage.createBlockchainLog({
+          userId: req.user.id,
+          operation: "CREATE_WALLET",
+          transactionHash: walletAddress,
+          details: "Created new Polkadot wallet address",
+          status: "completed"
+        });
+      }
       
       res.json({ 
         address: walletAddress,
@@ -751,79 +765,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ======== Appointments Routes ========
-  app.get("/api/appointments", requireAuth, async (req: any, res) => {
-    try {
-      const appointments = await storage.getAppointments(req.user.id);
-      res.json(appointments);
-    } catch (err) {
-      console.error("Error fetching appointments:", err);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
-
-  app.post("/api/appointments", requireAuth, async (req: any, res) => {
-    const { data, error } = validateSchema(insertAppointmentSchema, {
-      ...req.body,
-      userId: req.user.id,
-    });
-
-    if (error) {
-      return res.status(400).json({ message: error });
-    }
-
-    try {
-      const appointment = await storage.createAppointment(data);
-      
-      // Log activity
-      await storage.createActivity({
-        userId: req.user.id,
-        type: "appointment_created",
-        title: "Appointment Scheduled",
-        description: `${data.type} with ${data.doctorName}`,
-        metadata: { appointmentId: appointment.id },
-      });
-
-      res.status(201).json(appointment);
-    } catch (err) {
-      console.error("Error creating appointment:", err);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
-
-  // ======== Activities Routes ========
-  app.get("/api/activities", requireAuth, async (req: any, res) => {
-    try {
-      const activities = await storage.getActivities(req.user.id);
-      res.json(activities);
-    } catch (err) {
-      console.error("Error fetching activities:", err);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
-
   // Create HTTP server and WebSocket server
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ 
-    server: httpServer, 
-    path: '/ws',  // Use a distinct path to avoid conflicts with Vite HMR
+    server: httpServer,
+    path: '/ws',
     clientTracking: true,
     perMessageDeflate: false,
-    // Handle WebSocket CORS
     verifyClient: (info, callback) => {
-      // Allow all origins for WebSocket connections
-      callback(true);
+      callback(true); // Allow all connections
     }
   });
   
   // Store connected clients with their user info
   const clients = new Map();
   
-  // Handle WebSocket connections for real-time updates
+  // Handle WebSocket connections
   wss.on("connection", (ws, req) => {
     console.log("WebSocket client connected");
     
-    // Add a ping-pong mechanism to keep connections alive
+    // Add ping-pong mechanism
     const pingInterval = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
         ws.ping();
@@ -836,27 +797,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const data = JSON.parse(message.toString());
         console.log("Received WebSocket message:", data);
         
-        // Handle different message types
         switch (data.type) {
           case 'auth':
-            // Store user info with this connection
             if (data.userId) {
               clients.set(ws, { userId: data.userId });
-              // Send acknowledgment
               ws.send(JSON.stringify({ type: 'auth_success' }));
             }
             break;
             
           case 'medical_update':
-            // Broadcast medical record updates to authorized users
             if (clients.has(ws) && clients.get(ws).userId) {
-              // In a real app, check permissions before broadcasting
               broadcastToAuthorizedUsers(data, clients.get(ws).userId);
             }
             break;
             
           case 'consent_changed':
-            // Handle consent changes in real-time
             if (clients.has(ws) && data.providerId) {
               notifyProvider(data.providerId, data);
             }
@@ -873,28 +828,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Handle connection errors
     ws.on("error", (error) => {
       console.error("WebSocket connection error:", error.message);
-      // Don't terminate the connection on error
     });
     
     // Handle connection close
     ws.on("close", () => {
       console.log("WebSocket client disconnected");
-      // Clear ping interval
       clearInterval(pingInterval);
-      // Remove client from tracking
       clients.delete(ws);
     });
   });
-  
-  // Function to broadcast messages to users authorized to receive updates
+
+  // Function to broadcast messages to authorized users
   function broadcastToAuthorizedUsers(data: Record<string, any>, senderUserId: number): void {
     clients.forEach((clientData, client) => {
-      // Only send to clients in OPEN state
       if (client.readyState === WebSocket.OPEN) {
-        // Check if this client should receive the message
-        // In a real app, this would check consent records
         if (clientData.userId !== senderUserId) {
-          // Only send to relevant providers or specific users
           client.send(JSON.stringify({
             type: 'update',
             data: data
@@ -904,7 +852,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   }
   
-  // Function to notify a specific provider
+  // Function to notify specific providers
   function notifyProvider(providerId: number, data: Record<string, any>): void {
     clients.forEach((clientData, client) => {
       if (client.readyState === WebSocket.OPEN && clientData.providerId === providerId) {
@@ -919,7 +867,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add error handler for the WebSocket server
   wss.on("error", (error) => {
     console.error("WebSocket server error:", error.message);
-    // Don't crash the server on WebSocket errors
+  });
+
+  // Start the server
+  const port = process.env.PORT || 5000;
+  httpServer.listen(port, () => {
+    console.log(`Server running on port ${port}`);
   });
 
   return httpServer;
