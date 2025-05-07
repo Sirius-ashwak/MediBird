@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (res.status === 401) {
             // Only show toast for unexpected logouts
             const currentPath = window.location.pathname;
-            if (currentPath !== "/" && currentPath !== "/login") {
+            if (currentPath !== "/" && currentPath !== "/login" && currentPath !== "/auth") {
               toast({
                 title: "Session expired",
                 description: "Please log in again to continue.",
