@@ -36,6 +36,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/auth" component={LoginPage} />
+      <Route path="/login" component={LoginPage} /> {/* Add an alias to support both paths */}
       <ProtectedRoute path="/" component={ProtectedLayout} />
     </Switch>
   );
