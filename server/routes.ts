@@ -52,6 +52,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(passport.initialize());
   app.use(passport.session());
   
+  // Helper function to validate user registration
+  const validateRegistration = (username: string, password: string) => {
+    if (!username || username.length < 3) {
+      return "Username must be at least 3 characters long";
+    }
+    if (!password || password.length < 6) {
+      return "Password must be at least 6 characters long";
+    }
+    return null;
+  };
+
   // Configure passport local strategy
   passport.use(
     new LocalStrategy(async (username, password, done) => {
