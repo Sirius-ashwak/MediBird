@@ -14,26 +14,29 @@ import WebSocketDemo from "@/pages/WebSocketDemo";
 import MainLayout from "@/layouts/MainLayout";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/context/AuthContext";
-import LoginPage from "@/pages/LoginPage";
+import LoginPage from "@/pages/login-page";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
+  const ProtectedLayout = () => (
+    <MainLayout>
+      <Switch>
+        <Route path="/" component={Dashboard} />
+        <Route path="/records" component={MedicalRecords} />
+        <Route path="/consultations" component={AIConsultations} />
+        <Route path="/consent" component={ConsentManagement} />
+        <Route path="/providers" component={Providers} />
+        <Route path="/transactions" component={BlockchainLogs} />
+        <Route path="/websocket" component={WebSocketDemo} />
+        <Route component={NotFound} />
+      </Switch>
+    </MainLayout>
+  );
+
   return (
     <Switch>
-      <Route path="/login" component={LoginPage} />
-      <Route path="/">
-        <MainLayout>
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="/records" component={MedicalRecords} />
-            <Route path="/consultations" component={AIConsultations} />
-            <Route path="/consent" component={ConsentManagement} />
-            <Route path="/providers" component={Providers} />
-            <Route path="/transactions" component={BlockchainLogs} />
-            <Route path="/websocket" component={WebSocketDemo} />
-            <Route component={NotFound} />
-          </Switch>
-        </MainLayout>
-      </Route>
+      <Route path="/auth" component={LoginPage} />
+      <ProtectedRoute path="/" component={ProtectedLayout} />
     </Switch>
   );
 }

@@ -1,19 +1,21 @@
 /**
  * This module provides AI-powered health consultation services.
- * It integrates with Google's Gemini AI models via API.
+ * It integrates with OpenAI's GPT models for primary functionality,
+ * with a fallback to Google's Gemini AI models.
  */
 
+import { openAIService } from './openai';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-// Configure the Gemini API
-const API_KEY = process.env.GOOGLE_GEMINI_API_KEY || "AIzaSyAgev0-OnF9IKw_pdiJFZnmOLwjV1i0VjI";
+// Configure fallback Gemini API
+const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY || "AIzaSyAgev0-OnF9IKw_pdiJFZnmOLwjV1i0VjI";
 const MODEL_NAME = "gemini-1.5-pro";
 
-// Initialize the Gemini API client
-const genAI = new GoogleGenerativeAI(API_KEY);
+// Initialize the Gemini API client (for fallback)
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-// Configure safety settings
+// Configure safety settings for Gemini
 const safetySettings = [
   {
     category: HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -32,22 +34,6 @@ const safetySettings = [
     threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
   },
 ];
-
-// System prompt to guide the AI's responses
-const systemPrompt = `You are an AI health assistant at MediBridge, a healthcare platform that prioritizes privacy and security.
-
-IMPORTANT: 
-1. You provide general health information only, NOT medical diagnoses.
-2. Always remind users to consult healthcare professionals for medical advice.
-3. Base your responses on established medical knowledge and evidence-based health practices.
-4. Be precise with your information but make it accessible to non-medical users.
-5. If you don't have enough information, ask clarifying questions rather than making assumptions.
-6. Be respectful, empathetic, and considerate when discussing sensitive health topics.
-7. Format your responses clearly with bullet points, numbered lists, or paragraphs as appropriate.
-8. Your responses should be helpful but concise, generally no more than 250 words.
-9. If a user's question is completely unrelated to health or is inappropriate, politely redirect the conversation.
-
-Remember your role is to provide general health information and guidance, not to replace professional medical care.`;
 
 class AIService {
   private userChats: Map<number, any[]>;

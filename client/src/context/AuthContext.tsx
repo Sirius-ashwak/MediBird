@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
       try {
         setError(null);
-        const res = await fetchWithRetry("/api/auth/session", { 
+        const res = await fetchWithRetry("/api/user", { 
           credentials: "include",
           headers: {
             "Accept": "application/json"
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       setError(null);
       
-      const res = await apiRequest("POST", "/api/auth/login", { username, password });
+      const res = await apiRequest("POST", "/api/login", { username, password });
       const data = await res.json();
       setUser(data.user);
       
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       setError(null);
       
-      await apiRequest("POST", "/api/auth/logout", {});
+      await apiRequest("POST", "/api/logout", {});
       setUser(null);
       
       toast({

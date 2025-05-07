@@ -7,14 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from the public directory
-app.use(express.static(path.join(process.cwd(), "public")));
-
-// Routes for serving static HTML files
-app.get('/', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
-});
-
+// Serve websocket test from public directory
 app.get('/websocket-test', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'public', 'websocket-test.html'));
 });

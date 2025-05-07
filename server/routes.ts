@@ -25,6 +25,20 @@ import {
 const MemorySessionStore = MemoryStore(session);
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+      services: {
+        blockchain: true,
+        ai: true,
+        storage: true
+      }
+    });
+  });
+
   // Setup session and authentication
   const sessionMiddleware = session({
     secret: process.env.SESSION_SECRET || "medibridge-secret",
@@ -38,15 +52,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(passport.initialize());
   app.use(passport.session());
   
-  // Add a simple health check endpoint that doesn't require auth
-  app.get("/api/health", (req, res) => {
-    res.json({ 
-      status: "ok",
-      service: "MediBridge API",
-      timestamp: new Date().toISOString()
-    });
-  });
-
   // Configure passport local strategy
   passport.use(
     new LocalStrategy(async (username, password, done) => {
@@ -100,7 +105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // ======== Authentication Routes ========
-  app.post("/api/auth/register", async (req, res) => {
+  app.post("/api/register", async (req, res) => {
     const { data, error } = validateSchema(insertUserSchema, req.body);
     if (error) {
       return res.status(400).json({ message: error });
@@ -138,17 +143,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
     res.json({ user: req.user });
   });
 
-  app.post("/api/auth/logout", (req, res) => {
+  app.post("/api/logout", (req, res) => {
     req.logout(() => {
       res.json({ success: true });
     });
   });
 
-  app.get("/api/auth/session", (req, res) => {
+  app.get("/api/user", (req, res) => {
     if (req.isAuthenticated()) {
       return res.json({ user: req.user });
     }
