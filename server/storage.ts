@@ -133,10 +133,10 @@ export class MemStorage implements IStorage {
 
   // Initialize with sample data
   private initSampleData() {
-    // Sample user
-    const user: User = {
+    // Sample users
+    const user1: User = {
       id: this.currentIds.users++,
-      username: "sarahj",
+      username: "user1",
       password: "password123", // In a real app, this would be hashed
       name: "Sarah Johnson",
       email: "sarah@example.com",
@@ -145,12 +145,25 @@ export class MemStorage implements IStorage {
       role: "patient",
       createdAt: new Date(),
     };
-    this.users.set(user.id, user);
+    this.users.set(user1.id, user1);
+    
+    const user2: User = {
+      id: this.currentIds.users++,
+      username: "sarahj",
+      password: "password123", // In a real app, this would be hashed
+      name: "Sarah Johnson",
+      email: "sarah@example.com",
+      walletId: "0x9F52aD42a88F0E3e55c87E7E2b",
+      profileImage: "",
+      role: "patient",
+      createdAt: new Date(),
+    };
+    this.users.set(user2.id, user2);
 
     // Sample health profile
     const healthProfile: HealthProfile = {
       id: this.currentIds.healthProfiles++,
-      userId: user.id,
+      userId: user1.id,
       bloodType: "O+",
       height: "5'6\" (168 cm)",
       weight: "135 lbs (61 kg)",
@@ -198,7 +211,7 @@ export class MemStorage implements IStorage {
     const consents: Consent[] = [
       {
         id: this.currentIds.consents++,
-        userId: user.id,
+        userId: user1.id,
         providerId: 1, // Northwest Medical Center
         status: "approved",
         dataType: "medical_history,lab_results,prescriptions",
@@ -210,7 +223,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.consents++,
-        userId: user.id,
+        userId: user1.id,
         providerId: 2, // Dr. Emily Chen
         status: "approved",
         dataType: "medical_history,prescriptions",
@@ -222,7 +235,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.consents++,
-        userId: user.id,
+        userId: user1.id,
         providerId: 3, // CityLabs Diagnostics
         status: "pending",
         dataType: "lab_results",
@@ -242,7 +255,7 @@ export class MemStorage implements IStorage {
     const medicalRecords: MedicalRecord[] = [
       {
         id: this.currentIds.medicalRecords++,
-        userId: user.id,
+        userId: user1.id,
         type: "lab",
         title: "Complete Blood Count (CBC)",
         description: "Regular blood work",
@@ -264,7 +277,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.medicalRecords++,
-        userId: user.id,
+        userId: user1.id,
         type: "imaging",
         title: "Chest X-Ray",
         description: "Annual checkup",
@@ -280,7 +293,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.medicalRecords++,
-        userId: user.id,
+        userId: user1.id,
         type: "prescription",
         title: "Amoxicillin 500mg",
         description: "For bacterial infection",
@@ -306,7 +319,7 @@ export class MemStorage implements IStorage {
     const appointments: Appointment[] = [
       {
         id: this.currentIds.appointments++,
-        userId: user.id,
+        userId: user1.id,
         providerId: 1,
         doctorName: "Dr. Emily Chen",
         type: "checkup",
@@ -317,7 +330,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.appointments++,
-        userId: user.id,
+        userId: user1.id,
         providerId: 2,
         doctorName: "Dr. Robert Wilson",
         type: "consultation",
@@ -336,7 +349,7 @@ export class MemStorage implements IStorage {
     const activities: Activity[] = [
       {
         id: this.currentIds.activities++,
-        userId: user.id,
+        userId: user1.id,
         type: "record_upload",
         title: "Lab Results Uploaded",
         description: "Blood work results from City Hospital",
@@ -345,7 +358,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.activities++,
-        userId: user.id,
+        userId: user1.id,
         type: "access_granted",
         title: "Access Granted",
         description: "Dr. Emily Chen at Northwest Medical",
@@ -354,7 +367,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.activities++,
-        userId: user.id,
+        userId: user1.id,
         type: "ai_analysis",
         title: "AI Health Analysis",
         description: "Sleep pattern analysis completed",
@@ -371,7 +384,7 @@ export class MemStorage implements IStorage {
     const blockchainLogs: BlockchainLog[] = [
       {
         id: this.currentIds.blockchainLogs++,
-        userId: user.id,
+        userId: user1.id,
         operation: "STORE_RECORD",
         transactionHash: "0x72F934B2a7c8D5e6F3g4H5i6J7k8L9m",
         status: "completed",
@@ -380,7 +393,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.blockchainLogs++,
-        userId: user.id,
+        userId: user1.id,
         operation: "STORE_RECORD",
         transactionHash: "0x58A12FD7b8C9d0E1f2G3h4I5j6K7l8",
         status: "completed",
@@ -389,7 +402,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.blockchainLogs++,
-        userId: user.id,
+        userId: user1.id,
         operation: "STORE_RECORD",
         transactionHash: "0x31C79AF4c5D6e7F8g9H0i1J2k3L4m5",
         status: "completed",
@@ -398,7 +411,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.blockchainLogs++,
-        userId: user.id,
+        userId: user1.id,
         operation: "STORE_CONSENT",
         transactionHash: "0xD9eG7e43F8gF4c4d7bE6h1j2K6M8N9P",
         status: "completed",
@@ -407,7 +420,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: this.currentIds.blockchainLogs++,
-        userId: user.id,
+        userId: user1.id,
         operation: "CREATE_WALLET",
         transactionHash: "0xABC123DEF456GHI789JKL0MNOP",
         status: "completed",
@@ -423,7 +436,7 @@ export class MemStorage implements IStorage {
     // Sample AI consultations
     const aiConsultation: AiConsultation = {
       id: this.currentIds.aiConsultations++,
-      userId: user.id,
+      userId: user1.id,
       title: "Headache & Fatigue",
       status: "active",
       createdAt: new Date(2023, 6, 19), // July 19, 2023

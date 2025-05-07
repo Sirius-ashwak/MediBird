@@ -45,6 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
       try {
         setError(null);
+        console.log("Checking authentication status...");
+        
         const res = await fetch("/api/user", { 
           method: "GET",
           credentials: "include",
@@ -55,10 +57,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         if (res.ok) {
           const data = await res.json();
+          console.log("User authenticated:", data.user);
           setUser(data.user);
         } else {
+          console.log("User not authenticated, status:", res.status);
           // If not authenticated, explicitly set user to null
           setUser(null);
+          
+          if (res.status === 401) {
+            // Only show toast for unexpected logouts
+            const currentPath = window.location.pathname;
+            if (currentPath !== "/" && currentPath !== "/login") {
+              toast({
+                title: "Session expired",
+                description: "Please log in again to continue.",
+                variant: "destructive",
+              });
+            }
+          }
         }
       } catch (err) {
         console.error("Error checking auth:", err);
@@ -71,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     checkAuth();
-  }, []);
+  }, [toast]);
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
