@@ -25,10 +25,17 @@ export function ProtectedRoute({
   if (!isAuthenticated) {
     return (
       <Route path={path}>
-        <Redirect to="/auth" />
+        <Redirect to="/login" />
       </Route>
     );
   }
 
-  return <Route path={path} component={Component} />;
+  // Support both exact and nested paths
+  // This ensures "/", "/records", etc. all work properly
+  return (
+    <>
+      <Route path={path} component={Component} />
+      <Route path={`${path}/*`} component={Component} />
+    </>
+  );
 }
