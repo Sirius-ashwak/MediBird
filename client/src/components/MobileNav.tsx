@@ -25,11 +25,9 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
     return (
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 p-2">
         <div className="flex justify-around">
-          <Link href="/">
-            <a className={`flex flex-col items-center py-1 px-3 ${isActive("/") ? "text-primary-600" : "text-neutral-500"}`}>
-              <DashboardIcon className="text-xl" />
-              <span className="text-xs mt-1">Dashboard</span>
-            </a>
+          <Link href="/" className={`flex flex-col items-center py-1 px-3 ${isActive("/") ? "text-primary-600" : "text-neutral-500"}`}>
+            <DashboardIcon className="text-xl" />
+            <span className="text-xs mt-1">Dashboard</span>
           </Link>
           <Link href="/records">
             <a className={`flex flex-col items-center py-1 px-3 ${isActive("/records") ? "text-primary-600" : "text-neutral-500"}`}>

@@ -18,8 +18,18 @@ export default function MainLayout({ children }: MainLayoutProps) {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      setLocation('/login');
+      setLocation('/auth');
     }
+  }, [loading, isAuthenticated, setLocation]);
+
+  useEffect(() => {
+    // Refresh auth state periodically
+    const interval = setInterval(() => {
+      if (!loading && !isAuthenticated) {
+        setLocation('/auth');
+      }
+    }, 5000);
+    return () => clearInterval(interval);
   }, [loading, isAuthenticated, setLocation]);
 
   if (loading) {
