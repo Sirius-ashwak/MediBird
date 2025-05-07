@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,9 +12,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [registerName, setRegisterName] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
   const [registerUsername, setRegisterUsername] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
-  const [registerName, setRegisterName] = useState("");
+  const [registerWalletId, setRegisterWalletId] = useState(""); // Added walletId state
   const { login, loading, error } = useAuth();
   const [, setLocation] = useLocation();
   const [registrationError, setRegistrationError] = useState("");
@@ -44,6 +45,8 @@ export default function LoginPage() {
           username: registerUsername,
           password: registerPassword,
           name: registerName,
+          email: registerEmail, // Added email to payload
+          walletId: registerWalletId, // Added walletId to payload
         }),
       });
 
@@ -157,6 +160,17 @@ export default function LoginPage() {
                           />
                         </div>
                         <div className="space-y-2">
+                          <Label htmlFor="register-email">Email</Label>
+                          <Input
+                            id="register-email"
+                            type="email"
+                            placeholder="Enter your email"
+                            value={registerEmail}
+                            onChange={(e) => setRegisterEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
                           <Label htmlFor="register-username">Username</Label>
                           <Input
                             id="register-username"
@@ -174,6 +188,16 @@ export default function LoginPage() {
                             placeholder="Choose a password"
                             value={registerPassword}
                             onChange={(e) => setRegisterPassword(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="register-walletid">Wallet ID</Label>
+                          <Input
+                            id="register-walletid"
+                            placeholder="Enter your wallet ID"
+                            value={registerWalletId}
+                            onChange={(e) => setRegisterWalletId(e.target.value)}
                             required
                           />
                         </div>
@@ -195,7 +219,7 @@ export default function LoginPage() {
             </Tabs>
           </div>
         </div>
-        
+
         {/* Right Column - Hero Section */}
         <div className="hidden md:block md:w-1/2 bg-blue-600 rounded-r-lg p-8">
           <div className="flex flex-col justify-center h-full text-white">
