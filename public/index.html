@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>MediBridge - Decentralized Healthcare Platform</title>
+    <meta name="description" content="A secure, AI-powered healthcare platform using blockchain technology for privacy and data integrity." />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9fafb;
+        color: #1f2937;
+      }
+      .container {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 28rem;
+        width: 100%;
+        margin: 1rem;
+      }
+      .header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #2563eb;
+      }
+      .description {
+        color: #4b5563;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+      }
+      .status-box {
+        padding: 1rem;
+        background-color: #eff6ff;
+        border-radius: 0.375rem;
+        margin-top: 1.5rem;
+      }
+      .status-message {
+        margin-top: 0.5rem;
+        font-weight: 500;
+      }
+      .api-status {
+        margin-top: 1rem;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        background-color: #f3f4f6;
+        display: none;
+      }
+      .button {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-weight: 500;
+        margin-top: 1rem;
+      }
+      .button:hover {
+        background-color: #1d4ed8;
+      }
+      .feature-list {
+        margin-top: 1.5rem;
+      }
+      .feature {
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: flex-start;
+      }
+      .feature-icon {
+        margin-right: 0.5rem;
+        color: #2563eb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1 class="header">MediBridge</h1>
+        <p class="description">
+          A decentralized, AI-powered healthcare system using blockchain technology for secure medical data management and privacy protection.
+        </p>
+        
+        <div class="feature-list">
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>Secure medical record management</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>AI-powered health consultations</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>Blockchain verification of data integrity</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">✓</span>
+            <span>User-controlled consent management</span>
+          </div>
+        </div>
+        
+        <div class="status-box">
+          <p>System Status: <span id="status">Checking connection...</span></p>
+          <div id="api-status" class="api-status"></div>
+          <button id="check-api" class="button">Check API Connection</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const statusElement = document.getElementById('status');
+        const apiStatusElement = document.getElementById('api-status');
+        const checkApiButton = document.getElementById('check-api');
+        
+        checkApiButton.addEventListener('click', () => {
+          statusElement.textContent = 'Connecting to API...';
+          apiStatusElement.style.display = 'block';
+          
+          fetch('/api/health')
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              }
+              throw new Error(`Server responded with status: ${response.status}`);
+            })
+            .then(data => {
+              statusElement.textContent = 'Connected!';
+              statusElement.style.color = 'green';
+              apiStatusElement.textContent = `API Response: ${JSON.stringify(data)}`;
+              apiStatusElement.style.backgroundColor = '#dcfce7';
+            })
+            .catch(error => {
+              statusElement.textContent = 'Connection Error';
+              statusElement.style.color = 'red';
+              apiStatusElement.textContent = `Failed to connect: ${error.message}`;
+              apiStatusElement.style.backgroundColor = '#fee2e2';
+            });
+        });
+      });
+    </script>
+  </body>
+</html>
