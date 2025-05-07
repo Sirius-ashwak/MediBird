@@ -8,6 +8,7 @@ import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShieldCheckIcon } from "@/lib/icons";
 import { DataAccessProvider } from "@shared/schema";
+import { RiHospitalLine, RiUser6Line, RiTestTubeLine, RiAddLine } from 'react-icons/ri';
 
 export default function DataAccessControl() {
   const { data: providers, isLoading } = useQuery({
@@ -103,7 +104,7 @@ export default function DataAccessControl() {
         
         <div className="mt-4">
           <Button variant="outline" className="w-full">
-            <i className="ri-add-line mr-1"></i>
+            <RiAddLine className="mr-1" size={16} />
             Manage Data Access
           </Button>
         </div>
@@ -150,7 +151,9 @@ function ProviderAccessCard({
     <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-200">
       <div className="flex items-center space-x-3">
         <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}>
-          <i className={`${icon} ${iconColor}`}></i>
+          {icon === "ri-hospital-line" && <RiHospitalLine className={iconColor} size={20} />}
+          {icon === "ri-user-6-line" && <RiUser6Line className={iconColor} size={20} />}
+          {icon === "ri-test-tube-line" && <RiTestTubeLine className={iconColor} size={20} />}
         </div>
         <div className="flex-1">
           <h4 className="font-medium text-neutral-800">{name}</h4>

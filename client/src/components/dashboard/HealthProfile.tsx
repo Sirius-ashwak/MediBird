@@ -6,10 +6,22 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditIcon } from "@/lib/icons";
 import { useAuth } from "@/context/AuthContext";
+import { RiUser3Line } from 'react-icons/ri';
+
+interface HealthProfileData {
+  bloodType?: string;
+  height?: string;
+  weight?: string;
+  allergies?: string;
+  emergencyContact?: string;
+  age?: string;
+  gender?: string;
+  patientId?: string;
+}
 
 export default function HealthProfile() {
   const { user } = useAuth();
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading } = useQuery<HealthProfileData>({
     queryKey: ["/api/profile"],
   });
 
@@ -55,15 +67,15 @@ export default function HealthProfile() {
           <>
             <div className="flex items-center space-x-4 mb-4">
               <Avatar className="w-16 h-16 border-2 border-primary-100">
-                <AvatarImage src={user?.profileImage} alt={user?.name} />
-                <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+                <AvatarImage src={user?.profileImage || ""} alt={user?.name || "User"} />
+                <AvatarFallback>{(user?.name?.[0] || "U")}</AvatarFallback>
               </Avatar>
               <div>
                 <h4 className="font-medium text-neutral-800">{user?.name || "Sarah Johnson"}</h4>
                 <p className="text-sm text-neutral-500">{profile?.age || "32"} years old, {profile?.gender || "Female"}</p>
                 <div className="flex items-center mt-1">
                   <Badge variant="outline" className="bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full text-xs flex items-center">
-                    <i className="ri-user-3-line mr-1"></i>
+                    <RiUser3Line className="mr-1" size={14} />
                     <span>Patient ID: #{profile?.patientId || "8724531"}</span>
                   </Badge>
                 </div>

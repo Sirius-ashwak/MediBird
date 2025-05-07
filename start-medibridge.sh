@@ -1,12 +1,12 @@
 #!/bin/bash
-# Start script for MediBridge application
 
-echo "Starting MediBridge application..."
-
-# Set environment variables
-export PORT=5000
+# This script serves as an entry point for the MediBridge application
+# Set environment variables needed for the application
 export NODE_ENV=development
 export GOOGLE_API_KEY=AIzaSyAgev0-OnF9IKw_pdiJFZnmOLwjV1i0VjI
 
-# Start the combined server with Vite frontend + Express backend
-node --inspect server/index.ts
+# Kill any existing processes
+pkill -f "tsx server/index.ts" || true
+
+# Start the application
+npm run dev

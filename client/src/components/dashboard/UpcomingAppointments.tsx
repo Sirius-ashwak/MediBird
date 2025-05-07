@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarIcon, MapPinIcon, VideoIcon } from "@/lib/icons";
 import { Appointment } from "@shared/schema";
+import { RiAddLine } from 'react-icons/ri';
 
 export default function UpcomingAppointments() {
   const { data: appointments, isLoading } = useQuery({
@@ -15,7 +16,7 @@ export default function UpcomingAppointments() {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg">Upcoming Appointments</CardTitle>
         <Button variant="link" size="sm" className="text-sm text-primary-600 flex items-center">
-          <i className="ri-add-line mr-1"></i>
+          <RiAddLine className="mr-1" size={16} />
           <span>Add new</span>
         </Button>
       </CardHeader>
