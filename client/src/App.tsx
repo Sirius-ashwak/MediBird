@@ -13,21 +13,28 @@ import BlockchainLogs from "@/pages/BlockchainLogs";
 import WebSocketDemo from "@/pages/WebSocketDemo";
 import MainLayout from "@/layouts/MainLayout";
 import { ThemeProvider } from "next-themes";
+import { AuthProvider } from "@/context/AuthContext";
+import LoginPage from "@/pages/LoginPage";
 
 function Router() {
   return (
-    <MainLayout>
-      <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/records" component={MedicalRecords} />
-        <Route path="/consultations" component={AIConsultations} />
-        <Route path="/consent" component={ConsentManagement} />
-        <Route path="/providers" component={Providers} />
-        <Route path="/transactions" component={BlockchainLogs} />
-        <Route path="/websocket" component={WebSocketDemo} />
-        <Route component={NotFound} />
-      </Switch>
-    </MainLayout>
+    <Switch>
+      <Route path="/login" component={LoginPage} />
+      <Route path="/">
+        <MainLayout>
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/records" component={MedicalRecords} />
+            <Route path="/consultations" component={AIConsultations} />
+            <Route path="/consent" component={ConsentManagement} />
+            <Route path="/providers" component={Providers} />
+            <Route path="/transactions" component={BlockchainLogs} />
+            <Route path="/websocket" component={WebSocketDemo} />
+            <Route component={NotFound} />
+          </Switch>
+        </MainLayout>
+      </Route>
+    </Switch>
   );
 }
 
@@ -35,10 +42,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
