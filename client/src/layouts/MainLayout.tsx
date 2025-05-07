@@ -1,9 +1,10 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import MobileNav from "@/components/MobileNav";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -11,7 +12,15 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { loading } = useAuth();
+  const { loading, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      setLocation('/login');
+    }
+  }, [loading, isAuthenticated, setLocation]);
 
   if (loading) {
     return (
@@ -20,6 +29,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <span className="ml-2">Loading MediBridge...</span>
       </div>
     );
+  }
+  
+  // Don't render the layout if not authenticated
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (
