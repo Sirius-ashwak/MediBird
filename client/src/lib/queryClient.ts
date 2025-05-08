@@ -15,11 +15,22 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-export async function apiRequest(
-  method: string,
+export async function apiRequest<T = any>(
   url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
+  options: {
+    method?: string;
+    data?: unknown;
+    headers?: Record<string, string>;
+  } = {}
+): Promise<T> {
+  const { method = 'GET', data, headers = {} } = options;
+  
+  // Ensure URL is a string and handle it properly
+  if (typeof url !== 'string') {
+    console.error('Invalid URL provided to apiRequest:', url);
+    throw new Error('Invalid URL: URL must be a string');
+  }
+  
   // Make sure absolute URLs always have a leading slash
   const apiUrl = url.startsWith('http') ? url : url.startsWith('/') ? url : `/${url}`;
   
@@ -34,12 +45,14 @@ export async function apiRequest(
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
+          ...headers
         },
         body: data ? JSON.stringify(data) : undefined,
         credentials: "include",
       });
       break;
     } catch (err) {
+      console.error('Network error in apiRequest:', err);
       retries--;
       if (retries === 0) throw err;
       // Wait a bit before retrying
@@ -52,7 +65,10 @@ export async function apiRequest(
   }
 
   await throwIfResNotOk(res);
-  return res;
+  
+  // Parse the response as JSON and return it with the correct type
+  const responseData = await res.json();
+  return responseData as T;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

@@ -105,10 +105,11 @@ export default function BlockchainLogs() {
   const createWalletMutation = useMutation({
     mutationFn: () => {
       return apiRequest<{ address: string; created: boolean; timestamp: string }>('/api/blockchain/wallet', {
-        method: 'POST',
+        method: 'POST'
       });
     },
     onSuccess: (data) => {
+      console.log('Wallet creation successful:', data);
       toast({
         title: "Wallet Created",
         description: `Your new Polkadot wallet has been created with address: ${truncateHash(data.address)}`,
@@ -116,6 +117,7 @@ export default function BlockchainLogs() {
       queryClient.invalidateQueries({ queryKey: ['/api/blockchain/logs'] });
     },
     onError: (error) => {
+      console.error('Wallet creation failed:', error);
       toast({
         title: "Error Creating Wallet",
         description: error instanceof Error ? error.message : "An unknown error occurred",
