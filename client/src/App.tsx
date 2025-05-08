@@ -17,6 +17,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import LoginPage from "@/pages/login-page";
 import { ProtectedRoute } from "@/lib/protected-route";
+// Import Lucide icons for loading state
 import { Loader2 } from "lucide-react";
 
 function Router() {

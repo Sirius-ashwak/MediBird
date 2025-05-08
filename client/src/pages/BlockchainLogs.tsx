@@ -29,25 +29,39 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, Link as LinkIcon, AlertTriangle, ExternalLink, RefreshCw, Wallet } from 'lucide-react';
+// Skeletons removed as requested
 import { useToast } from '@/hooks/use-toast';
+
+// Lucide icons
+import {
+  Shield,
+  Link,
+  ExternalLink,
+  RefreshCw,
+  Wallet,
+  Database,
+  Server,
+  Network,
+  Crosshair,
+  ChevronRight,
+  Copy,
+  History,
+  Loader2 as LoaderIcon
+} from 'lucide-react';
 
 // Custom spinner component
 const Spinner = ({ size = 'md', className = '' }: { size?: 'sm' | 'md' | 'lg', className?: string }) => {
-  const sizeClasses = {
-    sm: 'h-4 w-4 border-2',
-    md: 'h-6 w-6 border-2',
-    lg: 'h-10 w-10 border-3',
+  const sizeMap = {
+    sm: 16,
+    md: 24,
+    lg: 36,
   };
-
+  
   return (
-    <div
-      className={`inline-block animate-spin rounded-full border-solid border-current border-t-transparent text-primary ${sizeClasses[size]} ${className}`}
-      role="status"
-      aria-label="loading"
-    >
-      <span className="sr-only">Loading...</span>
-    </div>
+    <LoaderIcon 
+      size={sizeMap[size]} 
+      className={`animate-spin text-primary ${className}`}
+    />
   );
 };
 
@@ -81,11 +95,11 @@ export default function BlockchainLogs() {
   
   // Query for fetching blockchain logs
   const { 
-    data: logs = [], 
+    data: logs = [] as BlockchainLog[], 
     isLoading: logsLoading, 
     isError: logsError,
     refetch: refetchLogs
-  } = useQuery({
+  } = useQuery<BlockchainLog[]>({
     queryKey: ['/api/blockchain/logs'],
     enabled: !!user,
   });
@@ -186,8 +200,10 @@ export default function BlockchainLogs() {
         <TabsContent value="logs" className="space-y-6">
           {blockchainInfo?.simulationMode && (
             <Alert className="bg-yellow-50 border-yellow-200">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Simulation Mode Active</AlertTitle>
+              <div className="flex items-center">
+                <Crosshair className="h-4 w-4 mr-2 text-yellow-600" />
+                <AlertTitle>Simulation Mode Active</AlertTitle>
+              </div>
               <AlertDescription>
                 The application is currently running in simulation mode. No real blockchain transactions are being processed.
               </AlertDescription>
@@ -197,7 +213,7 @@ export default function BlockchainLogs() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <ShieldCheck className="mr-2 h-5 w-5" />
+                <Shield className="mr-2 h-5 w-5" />
                 Blockchain Transaction History
               </CardTitle>
               <CardDescription>
@@ -211,8 +227,10 @@ export default function BlockchainLogs() {
                 </div>
               ) : logsError ? (
                 <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Error Loading Data</AlertTitle>
+                  <div className="flex items-center">
+                    <Database className="h-4 w-4 mr-2" />
+                    <AlertTitle>Error Loading Data</AlertTitle>
+                  </div>
                   <AlertDescription>
                     There was a problem loading your blockchain logs. Please try again.
                   </AlertDescription>
@@ -282,7 +300,8 @@ export default function BlockchainLogs() {
                 {createWalletMutation.isPending ? <Spinner className="mr-2" /> : <Wallet className="mr-2 h-4 w-4" />}
                 Create Polkadot Wallet
               </Button>
-              <Button variant="outline" onClick={() => refetchLogs()}>
+              <Button variant="outline" onClick={() => refetchLogs()} className="flex items-center">
+                <History className="mr-2 h-4 w-4" />
                 Refresh Logs
               </Button>
             </CardFooter>
@@ -293,7 +312,7 @@ export default function BlockchainLogs() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <LinkIcon className="mr-2 h-5 w-5" />
+                <Network className="mr-2 h-5 w-5" />
                 Polkadot Network Status
               </CardTitle>
               <CardDescription>
@@ -307,8 +326,10 @@ export default function BlockchainLogs() {
                 </div>
               ) : infoError ? (
                 <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Error Loading Network Info</AlertTitle>
+                  <div className="flex items-center">
+                    <Server className="h-4 w-4 mr-2" />
+                    <AlertTitle>Error Loading Network Info</AlertTitle>
+                  </div>
                   <AlertDescription>
                     There was a problem connecting to the blockchain network.
                   </AlertDescription>
@@ -367,8 +388,10 @@ export default function BlockchainLogs() {
                   
                   {blockchainInfo?.error && (
                     <Alert variant="destructive">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>Connection Error</AlertTitle>
+                      <div className="flex items-center">
+                        <Server className="h-4 w-4 mr-2" />
+                        <AlertTitle>Connection Error</AlertTitle>
+                      </div>
                       <AlertDescription>
                         {blockchainInfo.error}
                       </AlertDescription>
@@ -378,7 +401,8 @@ export default function BlockchainLogs() {
               )}
             </CardContent>
             <CardFooter>
-              <Button variant="outline" onClick={() => refetchInfo()}>
+              <Button variant="outline" onClick={() => refetchInfo()} className="flex items-center">
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh Network Status
               </Button>
             </CardFooter>
@@ -387,7 +411,10 @@ export default function BlockchainLogs() {
           {blockchainInfo?.connected && (
             <Card>
               <CardHeader>
-                <CardTitle>Polkadot Explorer Links</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Link className="mr-2 h-5 w-5" />
+                  Polkadot Explorer Links
+                </CardTitle>
                 <CardDescription>
                   Explore more details about the Polkadot blockchain
                 </CardDescription>

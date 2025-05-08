@@ -2,7 +2,7 @@
   "workflows": [
     {
       "name": "Start MediBridge",
-      "command": "bash ./start_app.sh",
+      "command": "npm run dev",
       "restartOn": {
         "files": ["client/", "server/", "shared", "package.json"]
       }
