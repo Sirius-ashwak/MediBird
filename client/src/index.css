@@ -25,25 +25,25 @@
 --radius: 0.5rem;
   }
   .dark {
-      --background: 222 47% 11%;
---foreground: 213 31% 91%;
---muted: 223 47% 14%;
---muted-foreground: 215 20% 65%;
---popover: 224 71% 4%;
---popover-foreground: 215 20% 95%;
---card: 224 71% 4%;
---card-foreground: 213 31% 91%;
---border: 216 34% 17%;
---input: 216 34% 17%;
+      --background: 0 0% 0%;
+--foreground: 0 0% 100%;
+--muted: 0 0% 15%;
+--muted-foreground: 0 0% 70%;
+--popover: 0 0% 3%;
+--popover-foreground: 0 0% 98%;
+--card: 0 0% 3%;
+--card-foreground: 0 0% 98%;
+--border: 0 0% 20%;
+--input: 0 0% 20%;
 --primary: 210 100% 52%;
---primary-foreground: 210 40% 98%;
---secondary: 222 47% 20%;
---secondary-foreground: 213 31% 91%;
---accent: 199 89% 48%;
---accent-foreground: 210 40% 98%;
+--primary-foreground: 0 0% 100%;
+--secondary: 0 0% 15%;
+--secondary-foreground: 0 0% 98%;
+--accent: 210 100% 50%;
+--accent-foreground: 0 0% 100%;
 --destructive: 0 63% 31%;
---destructive-foreground: 210 40% 98%;
---ring: 216 34% 17%;
+--destructive-foreground: 0 0% 100%;
+--ring: 210 100% 50%;
 --radius: 0.5rem;
   }
 
@@ -98,17 +98,17 @@
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
   }
   
-  /* Dark mode card effects */
+  /* Dark mode card effects - Apple-like */
   .dark .card-glow {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 1));
-    border: 1px solid rgba(51, 65, 85, 0.5);
+    background: rgba(25, 25, 25, 0.9);
+    border: 1px solid rgba(70, 70, 70, 0.5);
     transition: all 0.3s ease;
   }
   
   .dark .card-glow:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3),
-                0 0 15px -3px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5),
+                0 0 15px -3px rgba(59, 130, 246, 0.4);
   }
   
   /* Subtle dark mode animation effects */
