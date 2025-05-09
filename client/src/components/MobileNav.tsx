@@ -24,12 +24,12 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
   if (isMobileBar) {
     // Bottom navigation bar for mobile
     return (
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 p-2">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border p-2 transition-colors duration-300">
         <div className="flex justify-around">
           <Link 
             href="/" 
             onClick={() => {}}
-            className={`flex flex-col items-center py-1 px-3 ${isActive("/") ? "text-primary-600" : "text-neutral-500"}`}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/") ? "text-primary-600 dark:text-primary-400" : "text-muted-foreground"}`}
           >
             <DashboardIcon className="text-xl" />
             <span className="text-xs mt-1">Dashboard</span>
@@ -37,7 +37,7 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
           <Link 
             href="/records" 
             onClick={() => {}}
-            className={`flex flex-col items-center py-1 px-3 ${isActive("/records") ? "text-primary-600" : "text-neutral-500"}`}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/records") ? "text-primary-600 dark:text-primary-400" : "text-muted-foreground"}`}
           >
             <FileListIcon className="text-xl" />
             <span className="text-xs mt-1">Records</span>
@@ -45,7 +45,7 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
           <Link 
             href="/consultations" 
             onClick={() => {}}
-            className={`flex flex-col items-center py-1 px-3 ${isActive("/consultations") ? "text-primary-600" : "text-neutral-500"}`}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/consultations") ? "text-primary-600 dark:text-primary-400" : "text-muted-foreground"}`}
           >
             <UserVoiceIcon className="text-xl" />
             <span className="text-xs mt-1">Consult</span>
@@ -53,7 +53,7 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
           <Link 
             href="/transactions" 
             onClick={() => {}}
-            className={`flex flex-col items-center py-1 px-3 ${isActive("/transactions") ? "text-primary-600" : "text-neutral-500"}`}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/transactions") ? "text-primary-600 dark:text-primary-400" : "text-muted-foreground"}`}
           >
             <ExchangeIcon className="text-xl" />
             <span className="text-xs mt-1">Blockchain</span>
@@ -61,7 +61,7 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
           <Link 
             href="/consent" 
             onClick={() => {}}
-            className={`flex flex-col items-center py-1 px-3 ${isActive("/consent") ? "text-primary-600" : "text-neutral-500"}`}
+            className={`flex flex-col items-center py-1 px-3 ${isActive("/consent") ? "text-primary-600 dark:text-primary-400" : "text-muted-foreground"}`}
           >
             <LockIcon className="text-xl" />
             <span className="text-xs mt-1">Privacy</span>
@@ -100,8 +100,8 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
                 href={item.path}
                 className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg ${
                   isActive(item.path) 
-                    ? "bg-primary-50 text-primary-700" 
-                    : "text-neutral-600 hover:bg-neutral-100 transition-colors"
+                    ? "bg-primary-100/20 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400" 
+                    : "text-foreground hover:bg-muted transition-colors"
                 }`}
                 onClick={onClose}
               >
@@ -116,15 +116,17 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
       </nav>
       
       {/* Mobile user profile section */}
-      <div className="mt-auto pt-4 border-t border-neutral-200">
+      <div className="mt-auto pt-4 border-t border-border">
         <div className="flex items-center space-x-3 px-2">
           <Avatar className="w-10 h-10">
             <AvatarImage src={user?.profileImage || ""} alt={user?.name || "User"} />
-            <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+            <AvatarFallback className="bg-primary-600/20 text-primary-700 dark:bg-primary-400/20 dark:text-primary-400">
+              {user?.name?.[0] || "U"}
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm truncate">{user?.name || "Anonymous User"}</p>
-            <p className="text-xs text-neutral-500 truncate">
+            <p className="font-medium text-sm text-foreground truncate">{user?.name || "Anonymous User"}</p>
+            <p className="text-xs text-muted-foreground truncate">
               {user?.walletId ? 
                 `ID: ${user.walletId.substring(0, 6)}...${user.walletId.substring(user.walletId.length - 4)}` 
                 : "No Wallet ID"
@@ -135,7 +137,7 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
             variant="ghost" 
             size="icon" 
             onClick={() => logout()} 
-            className="text-neutral-400 hover:text-neutral-600"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <LogoutIcon />
           </Button>

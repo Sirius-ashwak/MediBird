@@ -25,26 +25,131 @@
 --radius: 0.5rem;
   }
   .dark {
-      --background: 240 10% 3.9%;
---foreground: 0 0% 98%;
---muted: 240 3.7% 15.9%;
---muted-foreground: 240 5% 64.9%;
---popover: 240 10% 3.9%;
---popover-foreground: 0 0% 98%;
---card: 240 10% 3.9%;
---card-foreground: 0 0% 98%;
---border: 240 3.7% 15.9%;
---input: 240 3.7% 15.9%;
---primary: 207 90% 54%;
---primary-foreground: 211 100% 99%;
---secondary: 240 3.7% 15.9%;
---secondary-foreground: 0 0% 98%;
---accent: 240 3.7% 15.9%;
---accent-foreground: 0 0% 98%;
---destructive: 0 62.8% 30.6%;
---destructive-foreground: 0 0% 98%;
---ring: 240 4.9% 83.9%;
+      --background: 222 47% 11%;
+--foreground: 213 31% 91%;
+--muted: 223 47% 14%;
+--muted-foreground: 215 20% 65%;
+--popover: 224 71% 4%;
+--popover-foreground: 215 20% 95%;
+--card: 224 71% 4%;
+--card-foreground: 213 31% 91%;
+--border: 216 34% 17%;
+--input: 216 34% 17%;
+--primary: 210 100% 52%;
+--primary-foreground: 210 40% 98%;
+--secondary: 222 47% 20%;
+--secondary-foreground: 213 31% 91%;
+--accent: 199 89% 48%;
+--accent-foreground: 210 40% 98%;
+--destructive: 0 63% 31%;
+--destructive-foreground: 210 40% 98%;
+--ring: 216 34% 17%;
 --radius: 0.5rem;
+  }
+
+  /* Dark mode animation overrides */
+  .dark .animate-pulse {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .dark .hover-glow {
+    transition: all 0.3s ease;
+  }
+  
+  .dark .hover-glow:hover {
+    box-shadow: 0 0 15px 5px rgba(56, 189, 248, 0.3);
+  }
+  
+  /* Elite dark mode gradients */
+  .dark .gradient-border {
+    position: relative;
+    border-radius: var(--radius);
+  }
+  
+  .dark .gradient-border::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    z-index: -1;
+    border-radius: calc(var(--radius) + 1px);
+    background: linear-gradient(45deg, #3b82f6, #06b6d4, #3b82f6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .dark .gradient-border:hover::before {
+    opacity: 1;
+  }
+  
+  /* Elite glowing elements for dark mode */
+  .dark .glow-text {
+    text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  }
+  
+  .dark .glow-border {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .dark .glow-border:hover {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  }
+  
+  /* Dark mode card effects */
+  .dark .card-glow {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 1));
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    transition: all 0.3s ease;
+  }
+  
+  .dark .card-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3),
+                0 0 15px -3px rgba(59, 130, 246, 0.3);
+  }
+  
+  /* Subtle dark mode animation effects */
+  .dark .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  /* Dark mode premium text effects */
+  .dark .text-gradient {
+    background: linear-gradient(to right, #60a5fa, #3b82f6, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+  }
+
+  /* Elite focus effects */
+  .dark input:focus, 
+  .dark select:focus, 
+  .dark textarea:focus {
+    box-shadow: 0 0 0 2px #1e293b, 0 0 0 4px rgba(59, 130, 246, 0.4);
+    outline: none;
+  }
+
+  /* Subtle background patterns for dark mode */
+  .dark .bg-pattern-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .dark .bg-pattern-grid {
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 
 @layer base {
@@ -53,6 +158,26 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-background text-foreground transition-colors duration-300;
+  }
+
+  /* Improve transitions for dark mode */
+  .transition-theme {
+    @apply transition-colors duration-300;
+  }
+
+  /* Card transitions */
+  .card {
+    @apply bg-card text-card-foreground transition-colors duration-300;
+  }
+  
+  /* Input transitions */
+  input, select, textarea {
+    @apply transition-colors duration-300;
+  }
+  
+  /* Button transitions */
+  button {
+    @apply transition-colors duration-200;
   }
 }
