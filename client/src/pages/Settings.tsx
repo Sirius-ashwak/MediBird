@@ -15,7 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
-import { ShieldCheckIcon, LockIcon, NotificationIcon, PrivacyIcon, SecurityIcon, UserIcon } from "@/lib/icons";
+import { ShieldCheckIcon, LockIcon, NotificationIcon, PrivacyIcon, SecurityIcon, UserIcon, UserCircleIcon, UploadIcon, TrashIcon } from "@/lib/icons";
 
 // Schema for profile settings
 const profileFormSchema = z.object({
@@ -191,56 +191,66 @@ export default function Settings() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-800">Settings</h1>
-      </div>
+    <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl md:text-3xl font-semibold text-neutral-800">Settings</h1>
+        </div>
 
-      <Tabs
-        defaultValue="profile"
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full space-y-6"
-      >
-        <TabsList className="grid grid-cols-4 gap-2 md:w-auto">
-          <TabsTrigger value="profile" className="flex items-center gap-1.5">
-            <UserIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-1.5">
-            <NotificationIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="privacy" className="flex items-center gap-1.5">
-            <PrivacyIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Privacy</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-1.5">
-            <SecurityIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Security</span>
-          </TabsTrigger>
-        </TabsList>
+        <Tabs
+          defaultValue="profile"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full space-y-8"
+        >
+          <TabsList className="inline-flex h-12 items-center justify-center rounded-lg bg-white p-1 shadow-sm border border-gray-200">
+            <TabsTrigger value="profile" className="flex items-center gap-2 px-4 py-2.5 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-700">
+              <UserIcon className="h-4 w-4" />
+              <span>Profile</span>
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2 px-4 py-2.5 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-700">
+              <NotificationIcon className="h-4 w-4" />
+              <span>Notifications</span>
+            </TabsTrigger>
+            <TabsTrigger value="privacy" className="flex items-center gap-2 px-4 py-2.5 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-700">
+              <PrivacyIcon className="h-4 w-4" />
+              <span>Privacy</span>
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2 px-4 py-2.5 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-700">
+              <SecurityIcon className="h-4 w-4" />
+              <span>Security</span>
+            </TabsTrigger>
+          </TabsList>
 
         {/* Profile Settings */}
         <TabsContent value="profile" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
+          <Card className="shadow-sm border border-gray-200 overflow-hidden bg-white">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-2 text-neutral-800">
+                <UserCircleIcon className="h-5 w-5 text-primary-600" />
+                Profile Information
+              </CardTitle>
+              <CardDescription className="text-neutral-600">
                 Update your personal information and how it appears on your profile.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-4 mb-6">
-                <Avatar className="w-20 h-20">
+            <CardContent className="p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6 pb-6 border-b border-gray-100">
+                <Avatar className="w-24 h-24 rounded-lg border-2 border-white shadow-md">
                   <AvatarImage src={user?.profileImage || ""} alt={user?.name || "User"} />
-                  <AvatarFallback className="text-lg">{user?.name?.[0] || "U"}</AvatarFallback>
+                  <AvatarFallback className="text-xl bg-primary-100 text-primary-700">{user?.name?.[0] || "U"}</AvatarFallback>
                 </Avatar>
-                <div>
-                  <Button variant="outline" size="sm">
-                    Change Avatar
-                  </Button>
-                  <p className="text-xs text-neutral-500 mt-1">
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-lg font-medium text-neutral-800">{user?.name || "Your Name"}</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="rounded-md border-gray-300 hover:bg-gray-50">
+                      <UploadIcon className="h-4 w-4 mr-1.5" /> Change Avatar
+                    </Button>
+                    <Button variant="ghost" size="sm" className="rounded-md text-red-600 hover:bg-red-50 hover:text-red-700">
+                      <TrashIcon className="h-4 w-4 mr-1.5" /> Remove
+                    </Button>
+                  </div>
+                  <p className="text-xs text-neutral-500">
                     JPG, GIF or PNG. 1MB max.
                   </p>
                 </div>
@@ -248,63 +258,76 @@ export default function Settings() {
 
               <Form {...profileForm}>
                 <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-                  <FormField
-                    control={profileForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={profileForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex items-center space-x-3 pt-4 border-t border-neutral-100">
-                    <ShieldCheckIcon className="text-secondary-600" />
-                    <p className="text-sm text-neutral-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={profileForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-neutral-700">Full Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="border-gray-300 focus:border-primary-400 focus:ring-1 focus:ring-primary-400" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-neutral-700">Email Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="border-gray-300 focus:border-primary-400 focus:ring-1 focus:ring-primary-400" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center p-3 rounded-lg bg-primary-50 border border-primary-100 text-primary-800">
+                    <ShieldCheckIcon className="h-5 w-5 text-primary-600 mr-2 flex-shrink-0" />
+                    <p className="text-sm">
                       Your profile information is securely stored and blockchain-verified
                     </p>
                   </div>
-                  <Button type="submit" disabled={profileMutation.isPending}>
-                    {profileMutation.isPending && <Spinner size="sm" className="mr-2" />}
-                    Save Profile
-                  </Button>
+                  
+                  <div className="flex justify-end pt-2">
+                    <Button 
+                      type="submit" 
+                      disabled={profileMutation.isPending}
+                      className="px-6 py-2.5 rounded-md bg-primary-600 hover:bg-primary-700 text-white font-medium"
+                    >
+                      {profileMutation.isPending && <Spinner size="sm" className="mr-2" />}
+                      Save Profile
+                    </Button>
+                  </div>
                 </form>
               </Form>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Blockchain Wallet</CardTitle>
-              <CardDescription>
+          <Card className="shadow-sm border border-gray-200 overflow-hidden bg-white">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-2 text-neutral-800">
+                <ShieldCheckIcon className="h-5 w-5 text-secondary-600" />
+                Blockchain Wallet
+              </CardTitle>
+              <CardDescription className="text-neutral-600">
                 Your decentralized identity on the Polkadot network
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg border border-neutral-200 mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-secondary-100 flex items-center justify-center">
-                    <ShieldCheckIcon className="text-secondary-600" />
+            <CardContent className="p-6 space-y-5">
+              <div className="flex items-center justify-between p-4 bg-secondary-50 rounded-lg border border-secondary-100 mb-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-lg bg-secondary-100 flex items-center justify-center shadow-sm">
+                    <ShieldCheckIcon className="h-6 w-6 text-secondary-600" />
                   </div>
                   <div>
-                    <p className="font-medium">Wallet ID</p>
-                    <p className="text-sm text-neutral-500 font-mono">
+                    <p className="font-medium text-neutral-800">Wallet ID</p>
+                    <p className="text-sm text-neutral-600 font-mono mt-1">
                       {user?.walletId ? 
                         `${user.walletId.substring(0, 12)}...${user.walletId.substring(user.walletId.length - 8)}` 
                         : "No Wallet ID"
@@ -312,14 +335,17 @@ export default function Settings() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
-                  Copy
+                <Button variant="outline" size="sm" className="rounded-md border-gray-300 hover:bg-gray-50">
+                  <span className="mr-1.5">Copy</span>
                 </Button>
               </div>
-              <div className="flex flex-col space-y-2">
-                <Button variant="outline">Regenerate Wallet</Button>
-                <Button variant="outline" className="border-secondary-200 bg-secondary-50 text-secondary-700 hover:bg-secondary-100">
-                  Export Keys (Advanced)
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                <Button variant="outline" className="rounded-md border-gray-300 hover:bg-gray-50 flex items-center justify-center">
+                  <span>Regenerate Wallet</span>
+                </Button>
+                <Button variant="outline" className="rounded-md border-secondary-200 bg-secondary-50 text-secondary-700 hover:bg-secondary-100 flex items-center justify-center">
+                  <LockIcon className="h-4 w-4 mr-1.5" /> 
+                  <span>Export Keys</span>
                 </Button>
               </div>
             </CardContent>
@@ -328,28 +354,28 @@ export default function Settings() {
 
         {/* Notification Settings */}
         <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <NotificationIcon className="text-primary-600" />
+          <Card className="shadow-sm border border-gray-200 overflow-hidden bg-white">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-2 text-neutral-800">
+                <NotificationIcon className="h-5 w-5 text-primary-600" />
                 Notification Settings
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-neutral-600">
                 Configure how and when you receive notifications about your healthcare data.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <Form {...notificationForm}>
                 <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
-                  <div className="space-y-4">
+                  <div className="grid gap-4">
                     <FormField
                       control={notificationForm.control}
                       name="emailNotifications"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">Email Notifications</FormLabel>
-                            <FormDescription>
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Email Notifications</FormLabel>
+                            <FormDescription className="text-neutral-600">
                               Receive email notifications about important updates
                             </FormDescription>
                           </div>
@@ -357,6 +383,7 @@ export default function Settings() {
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
                             />
                           </FormControl>
                         </FormItem>
@@ -366,10 +393,10 @@ export default function Settings() {
                       control={notificationForm.control}
                       name="appNotifications"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">App Notifications</FormLabel>
-                            <FormDescription>
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">App Notifications</FormLabel>
+                            <FormDescription className="text-neutral-600">
                               Receive in-app notifications and alerts
                             </FormDescription>
                           </div>
@@ -377,6 +404,7 @@ export default function Settings() {
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
                             />
                           </FormControl>
                         </FormItem>
@@ -386,10 +414,10 @@ export default function Settings() {
                       control={notificationForm.control}
                       name="consentAlerts"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">Consent Alerts</FormLabel>
-                            <FormDescription>
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Consent Alerts</FormLabel>
+                            <FormDescription className="text-neutral-600">
                               Get notified when a provider requests access to your data
                             </FormDescription>
                           </div>
@@ -397,6 +425,7 @@ export default function Settings() {
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
                             />
                           </FormControl>
                         </FormItem>
@@ -406,10 +435,10 @@ export default function Settings() {
                       control={notificationForm.control}
                       name="securityAlerts"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">Security Alerts</FormLabel>
-                            <FormDescription>
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Security Alerts</FormLabel>
+                            <FormDescription className="text-neutral-600">
                               Be alerted about important security events
                             </FormDescription>
                           </div>
@@ -417,6 +446,7 @@ export default function Settings() {
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
                             />
                           </FormControl>
                         </FormItem>
@@ -426,10 +456,10 @@ export default function Settings() {
                       control={notificationForm.control}
                       name="healthUpdates"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">Health Updates</FormLabel>
-                            <FormDescription>
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Health Updates</FormLabel>
+                            <FormDescription className="text-neutral-600">
                               Receive notifications about your health records
                             </FormDescription>
                           </div>
@@ -437,16 +467,26 @@ export default function Settings() {
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
                             />
                           </FormControl>
                         </FormItem>
                       )}
                     />
                   </div>
-                  <Button type="submit" disabled={notificationMutation.isPending}>
-                    {notificationMutation.isPending && <Spinner size="sm" className="mr-2" />}
-                    Save Notification Settings
-                  </Button>
+                  
+                  <div className="pt-4 border-t border-gray-200 mt-6">
+                    <div className="flex justify-end">
+                      <Button 
+                        type="submit" 
+                        disabled={notificationMutation.isPending}
+                        className="px-6 py-2.5 rounded-md bg-primary-600 hover:bg-primary-700 text-white font-medium"
+                      >
+                        {notificationMutation.isPending && <Spinner size="sm" className="mr-2" />}
+                        Save Notification Settings
+                      </Button>
+                    </div>
+                  </div>
                 </form>
               </Form>
             </CardContent>
@@ -455,111 +495,147 @@ export default function Settings() {
 
         {/* Privacy Settings */}
         <TabsContent value="privacy" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PrivacyIcon className="text-primary-600" />
+          <Card className="shadow-sm border border-gray-200 overflow-hidden bg-white">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-2 text-neutral-800">
+                <PrivacyIcon className="h-5 w-5 text-primary-600" />
                 Privacy Settings
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-neutral-600">
                 Control how your data is shared and used across the MediBridge platform.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <Form {...privacyForm}>
                 <form onSubmit={privacyForm.handleSubmit(onPrivacySubmit)} className="space-y-6">
-                  <FormField
-                    control={privacyForm.control}
-                    name="dataSharing"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>Data Sharing Level</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="minimal" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Minimal - Share only essential information
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="standard" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Standard - Balanced data sharing
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="comprehensive" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Comprehensive - Share detailed health information
-                              </FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={privacyForm.control}
-                    name="anonymizedDataForResearch"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">Research Contribution</FormLabel>
-                          <FormDescription>
-                            Allow anonymized data to be used for medical research
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={privacyForm.control}
-                    name="blockchainVerification"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">Blockchain Verification</FormLabel>
-                          <FormDescription>
-                            Enable blockchain verification for enhanced security
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex items-center space-x-3 pt-4 border-t border-neutral-100">
-                    <LockIcon className="text-secondary-600" />
-                    <p className="text-sm text-neutral-600">
+                  <div className="p-5 bg-gray-50 rounded-lg border border-gray-200">
+                    <FormField
+                      control={privacyForm.control}
+                      name="dataSharing"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <div>
+                            <FormLabel className="text-base font-medium text-neutral-800">Data Sharing Level</FormLabel>
+                            <FormDescription className="text-neutral-600">
+                              Choose how much of your health data can be shared with providers
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="grid gap-3"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-lg border border-gray-200 p-4 bg-white">
+                                <FormControl>
+                                  <RadioGroupItem value="minimal" className="text-primary-600" />
+                                </FormControl>
+                                <div className="space-y-1 flex-1">
+                                  <FormLabel className="font-medium text-neutral-800">
+                                    Minimal
+                                  </FormLabel>
+                                  <FormDescription className="text-neutral-600">
+                                    Share only essential information with healthcare providers
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-lg border border-gray-200 p-4 bg-white">
+                                <FormControl>
+                                  <RadioGroupItem value="standard" className="text-primary-600" />
+                                </FormControl>
+                                <div className="space-y-1 flex-1">
+                                  <FormLabel className="font-medium text-neutral-800">
+                                    Standard
+                                  </FormLabel>
+                                  <FormDescription className="text-neutral-600">
+                                    Balanced data sharing with your regular providers
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-lg border border-gray-200 p-4 bg-white">
+                                <FormControl>
+                                  <RadioGroupItem value="comprehensive" className="text-primary-600" />
+                                </FormControl>
+                                <div className="space-y-1 flex-1">
+                                  <FormLabel className="font-medium text-neutral-800">
+                                    Comprehensive
+                                  </FormLabel>
+                                  <FormDescription className="text-neutral-600">
+                                    Share detailed health information with all approved providers
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    <FormField
+                      control={privacyForm.control}
+                      name="anonymizedDataForResearch"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Research Contribution</FormLabel>
+                            <FormDescription className="text-neutral-600">
+                              Allow anonymized data to be used for medical research
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={privacyForm.control}
+                      name="blockchainVerification"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Blockchain Verification</FormLabel>
+                            <FormDescription className="text-neutral-600">
+                              Enable blockchain verification for enhanced security
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center space-x-3 p-4 mt-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <LockIcon className="h-5 w-5 text-blue-600" />
+                    <p className="text-sm text-blue-700">
                       Your privacy settings are protected and enforced with blockchain contracts
                     </p>
                   </div>
-                  <Button type="submit" disabled={privacyMutation.isPending}>
-                    {privacyMutation.isPending && <Spinner size="sm" className="mr-2" />}
-                    Save Privacy Settings
-                  </Button>
+                  
+                  <div className="pt-4 border-t border-gray-200 mt-6">
+                    <div className="flex justify-end">
+                      <Button 
+                        type="submit" 
+                        disabled={privacyMutation.isPending}
+                        className="px-6 py-2.5 rounded-md bg-primary-600 hover:bg-primary-700 text-white font-medium"
+                      >
+                        {privacyMutation.isPending && <Spinner size="sm" className="mr-2" />}
+                        Save Privacy Settings
+                      </Button>
+                    </div>
+                  </div>
                 </form>
               </Form>
             </CardContent>
@@ -568,123 +644,166 @@ export default function Settings() {
 
         {/* Security Settings */}
         <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <SecurityIcon className="text-primary-600" />
+          <Card className="shadow-sm border border-gray-200 overflow-hidden bg-white">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-2 text-neutral-800">
+                <SecurityIcon className="h-5 w-5 text-primary-600" />
                 Security Settings
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-neutral-600">
                 Configure security options to protect your healthcare data.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <Form {...securityForm}>
                 <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)} className="space-y-6">
-                  <FormField
-                    control={securityForm.control}
-                    name="twoFactorAuth"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">Two-Factor Authentication</FormLabel>
-                          <FormDescription>
-                            Add an extra layer of security to your account
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={securityForm.control}
-                    name="biometricLogin"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">Biometric Authentication</FormLabel>
-                          <FormDescription>
-                            Use fingerprint or face recognition for login
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={securityForm.control}
-                    name="sessionTimeout"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>Session Timeout</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="15" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                15 minutes (Recommended)
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="30" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                30 minutes
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="60" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                60 minutes
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="never" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Never (Not recommended)
-                              </FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex items-center space-x-3 pt-4 border-t border-neutral-100">
-                    <ShieldCheckIcon className="text-secondary-600" />
-                    <p className="text-sm text-neutral-600">
+                  <div className="space-y-4">
+                    <FormField
+                      control={securityForm.control}
+                      name="twoFactorAuth"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Two-Factor Authentication</FormLabel>
+                            <FormDescription className="text-neutral-600">
+                              Add an extra layer of security to your account
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={securityForm.control}
+                      name="biometricLogin"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                          <div className="space-y-1">
+                            <FormLabel className="text-base font-medium text-neutral-800">Biometric Authentication</FormLabel>
+                            <FormDescription className="text-neutral-600">
+                              Use fingerprint or face recognition for login
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-primary-600"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="p-5 bg-gray-50 rounded-lg border border-gray-200 mt-4">
+                    <FormField
+                      control={securityForm.control}
+                      name="sessionTimeout"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <div>
+                            <FormLabel className="text-base font-medium text-neutral-800">Session Timeout</FormLabel>
+                            <FormDescription className="text-neutral-600">
+                              Configure how long until your session expires due to inactivity
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="grid gap-3"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-lg border border-gray-200 p-4 bg-white">
+                                <FormControl>
+                                  <RadioGroupItem value="15" className="text-primary-600" />
+                                </FormControl>
+                                <div className="space-y-1 flex-1">
+                                  <FormLabel className="font-medium text-neutral-800">
+                                    15 minutes
+                                  </FormLabel>
+                                  <FormDescription className="text-neutral-600">
+                                    Recommended for high security (HIPAA compliant)
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-lg border border-gray-200 p-4 bg-white">
+                                <FormControl>
+                                  <RadioGroupItem value="30" className="text-primary-600" />
+                                </FormControl>
+                                <div className="space-y-1 flex-1">
+                                  <FormLabel className="font-medium text-neutral-800">
+                                    30 minutes
+                                  </FormLabel>
+                                  <FormDescription className="text-neutral-600">
+                                    Standard security timeout
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-lg border border-gray-200 p-4 bg-white">
+                                <FormControl>
+                                  <RadioGroupItem value="60" className="text-primary-600" />
+                                </FormControl>
+                                <div className="space-y-1 flex-1">
+                                  <FormLabel className="font-medium text-neutral-800">
+                                    60 minutes
+                                  </FormLabel>
+                                  <FormDescription className="text-neutral-600">
+                                    Extended session length
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-lg border border-gray-200 p-4 bg-white">
+                                <FormControl>
+                                  <RadioGroupItem value="never" className="text-primary-600" />
+                                </FormControl>
+                                <div className="space-y-1 flex-1">
+                                  <FormLabel className="font-medium text-neutral-800">
+                                    Never
+                                  </FormLabel>
+                                  <FormDescription className="text-neutral-600">
+                                    Not recommended for sensitive health data
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 mt-4 bg-green-50 rounded-lg border border-green-100">
+                    <ShieldCheckIcon className="h-5 w-5 text-green-600" />
+                    <p className="text-sm text-green-700">
                       Your account is protected with advanced security measures
                     </p>
                   </div>
-                  <div className="flex space-x-4">
-                    <Button type="submit" disabled={securityMutation.isPending}>
-                      {securityMutation.isPending && <Spinner size="sm" className="mr-2" />}
-                      Save Security Settings
-                    </Button>
-                    <Button variant="outline" type="button">
-                      Change Password
-                    </Button>
+                  
+                  <div className="pt-4 border-t border-gray-200 mt-6">
+                    <div className="flex justify-between items-center">
+                      <Button 
+                        variant="outline" 
+                        type="button"
+                        className="border-gray-300 hover:bg-gray-50 text-neutral-700"
+                      >
+                        Change Password
+                      </Button>
+                      
+                      <Button 
+                        type="submit" 
+                        disabled={securityMutation.isPending}
+                        className="px-6 py-2.5 rounded-md bg-primary-600 hover:bg-primary-700 text-white font-medium"
+                      >
+                        {securityMutation.isPending && <Spinner size="sm" className="mr-2" />}
+                        Save Security Settings
+                      </Button>
+                    </div>
                   </div>
                 </form>
               </Form>
@@ -692,6 +811,7 @@ export default function Settings() {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }
