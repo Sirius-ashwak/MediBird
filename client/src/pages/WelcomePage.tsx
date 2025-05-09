@@ -502,7 +502,7 @@ const WelcomePage = () => {
   }, [animationStep]);
 
   return (
-    <div className="h-screen w-full bg-gradient-to-br from-blue-900 via-indigo-800 to-indigo-900 dark:bg-black flex flex-col items-center justify-center overflow-hidden relative">
+    <div className="h-screen w-full bg-gradient-to-br from-blue-900 via-indigo-800 to-indigo-900 dark:bg-gradient-to-br dark:from-[#101725] dark:via-[#0c1220] dark:to-[#0a0f1a] flex flex-col items-center justify-center overflow-hidden relative bg-pattern-dots">
       {/* Canvas for blockchain animation */}
       <canvas 
         ref={canvasRef} 
@@ -511,9 +511,10 @@ const WelcomePage = () => {
       />
       
       <div className="container px-4 z-10 flex flex-col items-center">
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {animationStep >= 1 && (
             <motion.div
+              key="welcome-title"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
@@ -530,6 +531,7 @@ const WelcomePage = () => {
 
           {animationStep >= 3 && (
             <motion.div
+              key="feature-cards"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -563,6 +565,7 @@ const WelcomePage = () => {
 
           {showGetStarted && (
             <motion.div
+              key="get-started"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -571,7 +574,7 @@ const WelcomePage = () => {
               <Button 
                 onClick={() => setLocation('/login')} 
                 size="lg" 
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all dark:shadow-blue-900/30"
               >
                 Get Started <ArrowRight className="ml-2" size={18} />
               </Button>
@@ -588,7 +591,7 @@ const WelcomePage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
-            className="absolute bottom-8 left-8 bg-white/10 backdrop-blur-lg dark:bg-white/15 dark:backdrop-blur-xl p-3 rounded-lg flex items-center shadow-md dark:shadow-lg"
+            className="absolute bottom-8 left-8 bg-white/10 backdrop-blur-lg dark:bg-[rgba(32,41,58,0.8)] dark:backdrop-blur-xl p-3 rounded-lg flex items-center shadow-md dark:shadow-lg card-glow"
           >
             <div className="mr-3 text-green-400">
               <RefreshCw className="animate-spin" size={18} />
@@ -605,7 +608,7 @@ const WelcomePage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="absolute bottom-8 right-8 bg-white/10 backdrop-blur-lg dark:bg-white/15 dark:backdrop-blur-xl p-3 rounded-lg flex items-center shadow-md dark:shadow-lg"
+            className="absolute bottom-8 right-8 bg-white/10 backdrop-blur-lg dark:bg-[rgba(32,41,58,0.8)] dark:backdrop-blur-xl p-3 rounded-lg flex items-center shadow-md dark:shadow-lg card-glow"
           >
             <div className="mr-3 text-green-400">
               <FileCheck size={18} />

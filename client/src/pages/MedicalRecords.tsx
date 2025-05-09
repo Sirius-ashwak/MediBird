@@ -34,9 +34,9 @@ export default function MedicalRecords() {
   return (
     <main className="flex-1 overflow-auto p-6 md:pt-6 pt-20">
       <div className="mb-8">
-        <h2 className="font-display text-xl font-medium text-neutral-800 mb-4">Medical Records</h2>
+        <h2 className="font-display text-xl font-medium text-neutral-800 dark:text-white mb-4">Medical Records</h2>
         
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-neutral-200">
+        <div className="bg-white dark:bg-gradient-to-br dark:from-[#1A2035] dark:to-[#101626] p-4 rounded-xl shadow-sm border border-neutral-200 dark:border-slate-700 card-glow">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <div className="relative flex-1">
               <Input 
@@ -70,7 +70,7 @@ export default function MedicalRecords() {
             </TabsList>
             
             <TabsContent value="all" className="space-y-4">
-              <div className="rounded-lg border">
+              <div className="rounded-lg border dark:border-slate-700 dark:bg-[#1A2035]/40">
                 {isLoading ? (
                   <div className="p-4 space-y-4">
                     
@@ -81,86 +81,86 @@ export default function MedicalRecords() {
                 ) : (
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[100px]">Type</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Provider</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                      <TableRow className="dark:bg-slate-800/50 dark:border-slate-700">
+                        <TableHead className="w-[100px] dark:text-gray-300">Type</TableHead>
+                        <TableHead className="dark:text-gray-300">Description</TableHead>
+                        <TableHead className="dark:text-gray-300">Provider</TableHead>
+                        <TableHead className="dark:text-gray-300">Date</TableHead>
+                        <TableHead className="dark:text-gray-300">Status</TableHead>
+                        <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCell>
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700">Lab Result</Badge>
+                      <TableRow className="dark:border-slate-700/50">
+                        <TableCell className="dark:text-gray-300">
+                          <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 dark:border-blue-700/30">Lab Result</Badge>
                         </TableCell>
-                        <TableCell className="font-medium">Complete Blood Count (CBC)</TableCell>
-                        <TableCell>Northwest Medical Center</TableCell>
-                        <TableCell>July 15, 2023</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium dark:text-white">Complete Blood Count (CBC)</TableCell>
+                        <TableCell className="dark:text-gray-300">Northwest Medical Center</TableCell>
+                        <TableCell className="dark:text-gray-300">July 15, 2023</TableCell>
+                        <TableCell className="dark:text-gray-300">
                           <div className="flex items-center space-x-1">
-                            <CheckboxCircleIcon className="text-green-500" />
-                            <span className="text-sm">Verified</span>
+                            <CheckboxCircleIcon className="text-green-500 dark:text-emerald-400" />
+                            <span className="text-sm dark:text-emerald-300">Verified</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">View</Button>
-                          <Button variant="ghost" size="sm">Share</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">View</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">Share</Button>
                         </TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Badge variant="outline" className="bg-purple-50 text-purple-700">Imaging</Badge>
+                      <TableRow className="dark:border-slate-700/50">
+                        <TableCell className="dark:text-gray-300">
+                          <Badge variant="outline" className="bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 dark:border-purple-700/30">Imaging</Badge>
                         </TableCell>
-                        <TableCell className="font-medium">Chest X-Ray</TableCell>
-                        <TableCell>City Hospital</TableCell>
-                        <TableCell>June 22, 2023</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium dark:text-white">Chest X-Ray</TableCell>
+                        <TableCell className="dark:text-gray-300">City Hospital</TableCell>
+                        <TableCell className="dark:text-gray-300">June 22, 2023</TableCell>
+                        <TableCell className="dark:text-gray-300">
                           <div className="flex items-center space-x-1">
-                            <CheckboxCircleIcon className="text-green-500" />
-                            <span className="text-sm">Verified</span>
+                            <CheckboxCircleIcon className="text-green-500 dark:text-emerald-400" />
+                            <span className="text-sm dark:text-emerald-300">Verified</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">View</Button>
-                          <Button variant="ghost" size="sm">Share</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">View</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">Share</Button>
                         </TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Badge variant="outline" className="bg-green-50 text-green-700">Prescription</Badge>
+                      <TableRow className="dark:border-slate-700/50">
+                        <TableCell className="dark:text-gray-300">
+                          <Badge variant="outline" className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 dark:border-green-700/30">Prescription</Badge>
                         </TableCell>
-                        <TableCell className="font-medium">Amoxicillin 500mg</TableCell>
-                        <TableCell>Dr. Emily Chen</TableCell>
-                        <TableCell>June 15, 2023</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium dark:text-white">Amoxicillin 500mg</TableCell>
+                        <TableCell className="dark:text-gray-300">Dr. Emily Chen</TableCell>
+                        <TableCell className="dark:text-gray-300">June 15, 2023</TableCell>
+                        <TableCell className="dark:text-gray-300">
                           <div className="flex items-center space-x-1">
-                            <CheckboxCircleIcon className="text-green-500" />
-                            <span className="text-sm">Verified</span>
+                            <CheckboxCircleIcon className="text-green-500 dark:text-emerald-400" />
+                            <span className="text-sm dark:text-emerald-300">Verified</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">View</Button>
-                          <Button variant="ghost" size="sm">Share</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">View</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">Share</Button>
                         </TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Badge variant="outline" className="bg-orange-50 text-orange-700">Report</Badge>
+                      <TableRow className="dark:border-slate-700/50">
+                        <TableCell className="dark:text-gray-300">
+                          <Badge variant="outline" className="bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 dark:border-orange-700/30">Report</Badge>
                         </TableCell>
-                        <TableCell className="font-medium">Annual Physical Examination</TableCell>
-                        <TableCell>Dr. Robert Wilson</TableCell>
-                        <TableCell>May 10, 2023</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium dark:text-white">Annual Physical Examination</TableCell>
+                        <TableCell className="dark:text-gray-300">Dr. Robert Wilson</TableCell>
+                        <TableCell className="dark:text-gray-300">May 10, 2023</TableCell>
+                        <TableCell className="dark:text-gray-300">
                           <div className="flex items-center space-x-1">
-                            <CheckboxCircleIcon className="text-green-500" />
-                            <span className="text-sm">Verified</span>
+                            <CheckboxCircleIcon className="text-green-500 dark:text-emerald-400" />
+                            <span className="text-sm dark:text-emerald-300">Verified</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">View</Button>
-                          <Button variant="ghost" size="sm">Share</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">View</Button>
+                          <Button variant="ghost" size="sm" className="dark:text-blue-300 dark:hover:bg-blue-950/30">Share</Button>
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -168,10 +168,10 @@ export default function MedicalRecords() {
                 )}
               </div>
               
-              <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-200">
+              <div className="bg-neutral-50 dark:bg-gradient-to-r dark:from-blue-950/40 dark:to-indigo-950/40 p-3 rounded-lg border border-neutral-200 dark:border-blue-800/30 card-glow">
                 <div className="flex items-center space-x-2">
-                  <ShieldCheckIcon className="text-secondary-500 text-lg" />
-                  <p className="text-sm text-neutral-600">All your medical records are encrypted and verified on the Polkadot blockchain</p>
+                  <ShieldCheckIcon className="text-secondary-500 dark:text-blue-400 text-lg" />
+                  <p className="text-sm text-neutral-600 dark:text-gray-300">All your medical records are encrypted and verified on the Polkadot blockchain</p>
                 </div>
               </div>
             </TabsContent>

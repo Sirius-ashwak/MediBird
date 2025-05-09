@@ -38,10 +38,10 @@ const TipCharacter: React.FC<{ emotion: 'happy' | 'thinking' | 'excited'; animat
     case 'happy':
       return (
         <motion.div
-          className="bg-green-100 rounded-full p-3 w-16 h-16 flex items-center justify-center"
+          className="bg-green-100 dark:bg-green-900/40 dark:shadow-inner dark:shadow-green-500/20 rounded-full p-3 w-16 h-16 flex items-center justify-center"
           {...animationProps}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600 dark:text-green-400">
             <circle cx="12" cy="12" r="10"/>
             <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
             <line x1="9" x2="9.01" y1="9" y2="9"/>
@@ -53,10 +53,10 @@ const TipCharacter: React.FC<{ emotion: 'happy' | 'thinking' | 'excited'; animat
     case 'thinking':
       return (
         <motion.div
-          className="bg-blue-100 rounded-full p-3 w-16 h-16 flex items-center justify-center"
+          className="bg-blue-100 dark:bg-blue-900/40 dark:shadow-inner dark:shadow-blue-500/20 rounded-full p-3 w-16 h-16 flex items-center justify-center"
           {...animationProps}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 dark:text-blue-400">
             <circle cx="12" cy="12" r="10"/>
             <line x1="9" x2="9.01" y1="9" y2="9"/>
             <line x1="15" x2="15.01" y1="9" y2="9"/>
@@ -68,7 +68,7 @@ const TipCharacter: React.FC<{ emotion: 'happy' | 'thinking' | 'excited'; animat
     case 'excited':
       return (
         <motion.div
-          className="bg-purple-100 rounded-full p-3 w-16 h-16 flex items-center justify-center"
+          className="bg-purple-100 dark:bg-purple-900/40 dark:shadow-inner dark:shadow-purple-500/20 rounded-full p-3 w-16 h-16 flex items-center justify-center"
           animate={{ 
             scale: [1, 1.1, 1],
             rotate: [0, 5, 0, -5, 0],
@@ -80,7 +80,7 @@ const TipCharacter: React.FC<{ emotion: 'happy' | 'thinking' | 'excited'; animat
             repeatType: "mirror"
           }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600 dark:text-purple-400">
             <circle cx="12" cy="12" r="10"/>
             <path d="M8 9a2 2 0 0 1 4 0"/>
             <path d="M12 17v.01"/>
@@ -102,7 +102,7 @@ const tipCategories: HealthTipCategory[] = [
     name: 'Nutrition',
     color: 'green',
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600 dark:text-green-400">
         <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>
         <path d="M17.5 2H20a2 2 0 0 1 2 2v2.5"/>
         <path d="M2 12h5"/>
@@ -123,7 +123,7 @@ const tipCategories: HealthTipCategory[] = [
     name: 'Physical Activity',
     color: 'blue',
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600 dark:text-blue-400">
         <circle cx="12" cy="12" r="10"/>
         <path d="m4.9 15 3-3a21.2 21.2 0 0 0 3.6-5.5"/>
         <path d="m12.6 6.5 2 2"/>
@@ -145,7 +145,7 @@ const tipCategories: HealthTipCategory[] = [
     name: 'Mental Wellbeing',
     color: 'purple',
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600 dark:text-purple-400">
         <path d="M2 9V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/>
         <path d="M2 12v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4"/>
         <path d="M12 12H4a2 2 0 1 0 0 4h16a2 2 0 1 1 0 4H6"/>
@@ -164,11 +164,11 @@ const tipCategories: HealthTipCategory[] = [
     name: 'Preventive Care',
     color: 'amber',
     icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 dark:text-amber-400">
         <path d="M9 12h.01"/>
         <path d="M15 12h.01"/>
         <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/>
-        <path d="M19 9v3a6.98 6.98 0 0 1-3.32 5.94A2 2 0 0 0 14 20.28a19.6 19.6 0 0 1-4 0 2 2 0 0 0-1.68-2.34A6.98 6.98 0 0 1 5 12V9"/>
+        <path d="M19 9v3a6.98 6.98 0 0 1-3.32 5.94A2 2 0 0 0 14 20.28a19.6 19.6 0 0 1-4 0a2 2 0 0 0-1.68-2.34A6.98 6.98 0 0 1 5 12V9"/>
         <path d="M4 15.86V15a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.86"/>
         <path d="M7 15v-1a5 5 0 0 1 10 0v1"/>
         <path d="m13 7.75-.95.95"/>
@@ -266,11 +266,11 @@ const HealthTips: React.FC<HealthTipsProps> = ({
   // Helper function to get dynamic classes
   const getHeaderClass = () => {
     const color = currentTip?.category.color || 'blue';
-    if (color === 'green') return 'bg-gradient-to-r from-green-50 to-green-100';
-    if (color === 'blue') return 'bg-gradient-to-r from-blue-50 to-blue-100';
-    if (color === 'purple') return 'bg-gradient-to-r from-purple-50 to-purple-100';
-    if (color === 'amber') return 'bg-gradient-to-r from-amber-50 to-amber-100';
-    return 'bg-gradient-to-r from-blue-50 to-blue-100';
+    if (color === 'green') return 'bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950/60 dark:to-emerald-900/30';
+    if (color === 'blue') return 'bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/60 dark:to-indigo-900/30';
+    if (color === 'purple') return 'bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950/60 dark:to-violet-900/30';
+    if (color === 'amber') return 'bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/60 dark:to-yellow-900/30';
+    return 'bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/60 dark:to-indigo-900/30';
   };
   
   const [isHovered, setIsHovered] = useState(false);
@@ -420,7 +420,7 @@ const HealthTips: React.FC<HealthTipsProps> = ({
                   {/* Text highlight animation for emphasis */}
                   {isHovered && currentTip?.tip && (
                     <motion.div
-                      className="w-full h-2 mt-0.5 bg-gradient-to-r from-transparent via-primary-100 to-transparent"
+                      className="w-full h-2 mt-0.5 bg-gradient-to-r from-transparent via-primary-100 to-transparent dark:via-primary-800/40"
                       initial={{ scaleX: 0, opacity: 0 }}
                       animate={{ scaleX: 1, opacity: 0.6 }}
                       transition={{ duration: 1 }}
@@ -452,12 +452,12 @@ const HealthTips: React.FC<HealthTipsProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => handleReaction(true)}
-                      className={`text-xs relative overflow-hidden ${reaction === 'liked' ? 'bg-green-50 border-green-200 text-green-700' : ''}`}
+                      className={`text-xs relative overflow-hidden ${reaction === 'liked' ? 'bg-green-50 border-green-200 text-green-700 dark:bg-green-900/40 dark:border-green-700/30 dark:text-green-300' : 'dark:border-slate-700 dark:text-slate-300'}`}
                       disabled={!!reaction}
                     >
                       {reaction === 'liked' && (
                         <motion.div
-                          className="absolute inset-0 bg-green-100"
+                          className="absolute inset-0 bg-green-100 dark:bg-green-800/20"
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ duration: 0.3 }}
@@ -474,7 +474,7 @@ const HealthTips: React.FC<HealthTipsProps> = ({
                           repeat: reaction === 'liked' ? 1 : 0
                         }}
                       >
-                        <ThumbsUp className={`h-3 w-3 mr-1 ${reaction === 'liked' ? 'text-green-600' : ''}`} />
+                        <ThumbsUp className={`h-3 w-3 mr-1 ${reaction === 'liked' ? 'text-green-600 dark:text-green-400' : ''}`} />
                         <span>Helpful</span>
                       </motion.div>
                     </Button>
@@ -491,12 +491,12 @@ const HealthTips: React.FC<HealthTipsProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => handleReaction(false)}
-                      className={`text-xs relative overflow-hidden ${reaction === 'disliked' ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
+                      className={`text-xs relative overflow-hidden ${reaction === 'disliked' ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/40 dark:border-blue-700/30 dark:text-blue-300' : 'dark:border-slate-700 dark:text-slate-300'}`}
                       disabled={!!reaction}
                     >
                       {reaction === 'disliked' && (
                         <motion.div
-                          className="absolute inset-0 bg-blue-100"
+                          className="absolute inset-0 bg-blue-100 dark:bg-blue-800/20"
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ duration: 0.3 }}
@@ -513,7 +513,7 @@ const HealthTips: React.FC<HealthTipsProps> = ({
                           repeat: reaction === 'disliked' ? 1 : 0
                         }}
                       >
-                        <ThumbsDown className={`h-3 w-3 mr-1 ${reaction === 'disliked' ? 'text-blue-600' : ''}`} />
+                        <ThumbsDown className={`h-3 w-3 mr-1 ${reaction === 'disliked' ? 'text-blue-600 dark:text-blue-400' : ''}`} />
                         <span>Not for me</span>
                       </motion.div>
                     </Button>
