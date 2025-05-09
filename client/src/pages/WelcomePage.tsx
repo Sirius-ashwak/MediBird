@@ -502,7 +502,7 @@ const WelcomePage = () => {
   }, [animationStep]);
 
   return (
-    <div className="h-screen w-full bg-gradient-to-br from-blue-900 via-indigo-800 to-indigo-900 flex flex-col items-center justify-center overflow-hidden relative">
+    <div className="h-screen w-full bg-gradient-to-br from-blue-900 via-indigo-800 to-indigo-900 dark:from-blue-950 dark:via-indigo-900 dark:to-blue-900 flex flex-col items-center justify-center overflow-hidden relative">
       {/* Canvas for blockchain animation */}
       <canvas 
         ref={canvasRef} 
@@ -535,28 +535,28 @@ const WelcomePage = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12"
             >
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl">
-                <div className="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+              <div className="bg-white/10 backdrop-blur-lg dark:bg-white/15 dark:backdrop-blur-xl p-6 rounded-xl shadow-md dark:shadow-lg">
+                <div className="bg-blue-600 dark:bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
                   <Shield className="text-white" size={22} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Secure Data</h3>
-                <p className="text-blue-100">Your medical records are encrypted and secured using advanced blockchain technology</p>
+                <p className="text-blue-100 dark:text-blue-50">Your medical records are encrypted and secured using advanced blockchain technology</p>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl">
-                <div className="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+              <div className="bg-white/10 backdrop-blur-lg dark:bg-white/15 dark:backdrop-blur-xl p-6 rounded-xl shadow-md dark:shadow-lg">
+                <div className="bg-blue-600 dark:bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
                   <Lock className="text-white" size={22} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Privacy Control</h3>
-                <p className="text-blue-100">You control who has access to your medical information at all times</p>
+                <p className="text-blue-100 dark:text-blue-50">You control who has access to your medical information at all times</p>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl">
-                <div className="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+              <div className="bg-white/10 backdrop-blur-lg dark:bg-white/15 dark:backdrop-blur-xl p-6 rounded-xl shadow-md dark:shadow-lg">
+                <div className="bg-blue-600 dark:bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center mb-4">
                   <Database className="text-white" size={22} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Decentralized</h3>
-                <p className="text-blue-100">No single point of failure ensures your data remains accessible when you need it</p>
+                <p className="text-blue-100 dark:text-blue-50">No single point of failure ensures your data remains accessible when you need it</p>
               </div>
             </motion.div>
           )}
@@ -588,7 +588,7 @@ const WelcomePage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
-            className="absolute bottom-8 left-8 bg-white/10 backdrop-blur-lg p-3 rounded-lg flex items-center"
+            className="absolute bottom-8 left-8 bg-white/10 backdrop-blur-lg dark:bg-white/15 dark:backdrop-blur-xl p-3 rounded-lg flex items-center shadow-md dark:shadow-lg"
           >
             <div className="mr-3 text-green-400">
               <RefreshCw className="animate-spin" size={18} />
@@ -605,7 +605,7 @@ const WelcomePage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="absolute bottom-8 right-8 bg-white/10 backdrop-blur-lg p-3 rounded-lg flex items-center"
+            className="absolute bottom-8 right-8 bg-white/10 backdrop-blur-lg dark:bg-white/15 dark:backdrop-blur-xl p-3 rounded-lg flex items-center shadow-md dark:shadow-lg"
           >
             <div className="mr-3 text-green-400">
               <FileCheck size={18} />
