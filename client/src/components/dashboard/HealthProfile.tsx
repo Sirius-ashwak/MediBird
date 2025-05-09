@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { EditIcon } from "@/lib/icons";
 import { useAuth } from "@/context/AuthContext";
 import { RiUser3Line } from 'react-icons/ri';
@@ -43,25 +44,8 @@ export default function HealthProfile() {
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          // Loading skeleton
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <Skeleton className="h-16 w-16 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-3 w-32" />
-                <Skeleton className="h-6 w-32 rounded-full" />
-              </div>
-            </div>
-            
-            <div className="space-y-3 pt-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <Skeleton className="h-3 w-24" />
-                  <Skeleton className="h-3 w-32" />
-                </div>
-              ))}
-            </div>
+          <div className="flex justify-center p-8">
+            <Spinner size="lg" />
           </div>
         ) : (
           <>

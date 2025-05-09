@@ -22,7 +22,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { HospitalIcon, ShieldCheckIcon } from "@/lib/icons";
 import { useToast } from "@/hooks/use-toast";
 import { Provider } from "@shared/schema";
@@ -301,8 +301,8 @@ function renderProviderTable(providers: Provider[] | undefined, isLoading: boole
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-64 w-full" />
+        
+        
       </div>
     );
   }

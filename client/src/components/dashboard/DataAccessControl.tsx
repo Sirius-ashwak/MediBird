@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Spinner } from "@/components/ui/spinner";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { ShieldCheckIcon } from "@/lib/icons";
 import { DataAccessProvider } from "@shared/schema";
 import { RiHospitalLine, RiUser6Line, RiTestTubeLine, RiAddLine } from 'react-icons/ri';
@@ -46,22 +47,9 @@ export default function DataAccessControl() {
       <CardContent>
         <div className="space-y-4">
           {isLoading ? (
-            // Loading skeleton
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="p-3 bg-neutral-50 rounded-lg border border-neutral-200">
-                <div className="flex items-center space-x-3">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-36" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                  <Skeleton className="h-5 w-10 rounded-full" />
-                </div>
-                <div className="mt-3 pt-3 border-t border-neutral-200">
-                  <Skeleton className="h-3 w-full" />
-                </div>
-              </div>
-            ))
+            <div className="flex justify-center p-8">
+              <Spinner size="lg" />
+            </div>
           ) : (
             <>
               <ProviderAccessCard 

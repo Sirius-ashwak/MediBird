@@ -30,7 +30,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { CheckboxCircleIcon, ShieldCheckIcon, LockIcon } from "@/lib/icons";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -181,8 +181,8 @@ export default function ConsentManagement() {
                 <TabsContent value="active">
                   {isLoading ? (
                     <div className="space-y-4">
-                      <Skeleton className="h-12 w-full" />
-                      <Skeleton className="h-64 w-full" />
+                      
+                      
                     </div>
                   ) : activeProviders?.length > 0 ? (
                     <Table>
@@ -262,8 +262,8 @@ export default function ConsentManagement() {
                 <TabsContent value="pending">
                   {isLoading ? (
                     <div className="space-y-4">
-                      <Skeleton className="h-12 w-full" />
-                      <Skeleton className="h-64 w-full" />
+                      
+                      
                     </div>
                   ) : pendingProviders?.length > 0 ? (
                     <Table>
@@ -382,9 +382,9 @@ export default function ConsentManagement() {
               <div className="space-y-4">
                 {isLoading ? (
                   <>
-                    <Skeleton className="h-16 w-full" />
-                    <Skeleton className="h-16 w-full" />
-                    <Skeleton className="h-16 w-full" />
+                    
+                    
+                    
                   </>
                 ) : (
                   <>

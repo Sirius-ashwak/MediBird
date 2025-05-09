@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { CalendarIcon, MapPinIcon, VideoIcon } from "@/lib/icons";
 import { Appointment } from "@shared/schema";
 import { RiAddLine } from 'react-icons/ri';
@@ -23,26 +24,9 @@ export default function UpcomingAppointments() {
       <CardContent>
         <div className="space-y-3">
           {isLoading ? (
-            // Loading skeleton
-            Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-3 w-24" />
-                    <Skeleton className="h-4 w-36" />
-                    <Skeleton className="h-3 w-32" />
-                  </div>
-                </div>
-                <div className="mt-3 pt-3 border-t border-neutral-200 flex justify-between">
-                  <Skeleton className="h-3 w-32" />
-                  <div className="flex space-x-2">
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                </div>
-              </div>
-            ))
+            <div className="flex justify-center p-8">
+              <Spinner size="lg" />
+            </div>
           ) : (
             <>
               <div className="p-3 bg-primary-50 border border-primary-100 rounded-lg">

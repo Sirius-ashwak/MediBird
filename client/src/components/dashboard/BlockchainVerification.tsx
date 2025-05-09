@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { CheckboxCircleIcon } from "@/lib/icons";
 
 export default function BlockchainVerification() {
@@ -47,9 +47,9 @@ export default function BlockchainVerification() {
           <div className="overflow-x-auto">
             {isLoading ? (
               <div className="space-y-2">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
+                
+                
+                
               </div>
             ) : (
               <Table>

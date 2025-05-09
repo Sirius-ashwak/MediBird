@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { AIIcon, SendIcon, ShieldCheckIcon } from "@/lib/icons";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
@@ -155,9 +155,9 @@ export default function AIConsultations() {
               <CardContent>
                 {isLoading ? (
                   <div className="space-y-4">
-                    <Skeleton className="h-16 w-full" />
-                    <Skeleton className="h-16 w-full" />
-                    <Skeleton className="h-16 w-full" />
+                    
+                    
+                    
                   </div>
                 ) : consultations && consultations.length > 0 ? (
                   <div className="space-y-2">

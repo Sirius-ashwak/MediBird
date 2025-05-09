@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { 
   FileListIcon, 
   SearchIcon, 
@@ -73,10 +73,10 @@ export default function MedicalRecords() {
               <div className="rounded-lg border">
                 {isLoading ? (
                   <div className="p-4 space-y-4">
-                    <Skeleton className="h-8 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
+                    
+                    
+                    
+                    
                   </div>
                 ) : (
                   <Table>
