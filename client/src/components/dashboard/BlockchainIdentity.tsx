@@ -175,17 +175,18 @@ export default function BlockchainIdentity() {
                     className="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200 group"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow group-hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-center gap-4">
+                        {/* Properly sized and positioned icon container */}
+                        <div className="w-12 h-12 min-w-[3rem] rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center shadow group-hover:shadow-lg transition-all duration-300">
                           <Key className="text-white h-5 w-5" />
                         </div>
-                        <div className="ml-4">
-                          <div className="flex items-center">
+                        <div>
+                          <div className="flex items-center flex-wrap gap-2">
                             <h4 className="font-semibold text-slate-800 dark:text-slate-200">
                               {credentialTypeLabels[credential.type] || credential.type}
                             </h4>
                             {credential.verified && (
-                              <Badge variant="outline" className="ml-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                              <Badge variant="outline" className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                                 <Check size={10} className="mr-1" />
                                 <span className="text-[10px] font-medium">Verified</span>
                               </Badge>
@@ -198,7 +199,7 @@ export default function BlockchainIdentity() {
                           </div>
                         </div>
                       </div>
-                      <div>
+                      <div className="ml-2">
                         <Button 
                           variant="outline" 
                           size="sm"
