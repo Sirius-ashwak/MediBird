@@ -2,8 +2,12 @@ import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SearchIcon, NotificationIcon, SettingsIcon } from "@/lib/icons";
+import { ChevronLeft, ChevronRight, Menu } from "lucide-react";
+import { SidebarContext } from "@/layouts/MainLayout";
 
 export default function Header() {
+  // Access sidebar state from MainLayout context
+  const { isSidebarCollapsed, toggleSidebar } = SidebarContext;
   const [location] = useLocation();
   
   const getPageTitle = () => {
@@ -20,6 +24,8 @@ export default function Header() {
         return "Healthcare Providers";
       case "/transactions":
         return "Blockchain Logs";
+      case "/websocket":
+        return "WebSocket Demo";
       default:
         return "MediBridge";
     }
@@ -28,7 +34,19 @@ export default function Header() {
   return (
     <header className="bg-white border-b border-neutral-200 py-4 px-6 hidden md:block">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-semibold text-neutral-800">{getPageTitle()}</h1>
+        <div className="flex items-center">
+          {/* Separate toggle button in header for better visibility */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="mr-4 p-1.5 rounded-lg hover:bg-neutral-100 border border-neutral-200 text-neutral-600"
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isSidebarCollapsed ? <ChevronRight className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+          <h1 className="font-display text-2xl font-semibold text-neutral-800">{getPageTitle()}</h1>
+        </div>
         <div className="flex items-center space-x-4">
           <div className="relative">
             <Input 

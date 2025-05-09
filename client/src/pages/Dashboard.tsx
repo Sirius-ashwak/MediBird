@@ -7,6 +7,7 @@ import BlockchainIdentity from "@/components/dashboard/BlockchainIdentity";
 import HealthProfile from "@/components/dashboard/HealthProfile";
 import DataAccessControl from "@/components/dashboard/DataAccessControl";
 import UpcomingAppointments from "@/components/dashboard/UpcomingAppointments";
+import HealthTips from "@/components/dashboard/HealthTips";
 import { 
   FileListIcon, 
   CalendarIcon, 
@@ -88,6 +89,7 @@ export default function Dashboard() {
           {/* Right column (1/3 width) */}
           <div className="space-y-8">
             <HealthProfile />
+            <HealthTips preferredCategory="nutrition" showRandomInitially={true} />
             <DataAccessControl />
             <UpcomingAppointments />
           </div>

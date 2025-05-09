@@ -6,15 +6,41 @@ import { useAuth } from "@/context/AuthContext";
 import { Loader2, Menu, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { PulseIcon } from "@/lib/icons";
+import HealthTip from "@/components/HealthTip";
 
 interface MainLayoutProps {
   children: ReactNode;
 }
 
+// Create a context to share the sidebar state
+export const SidebarContext = {
+  isSidebarCollapsed: false,
+  toggleSidebar: () => {}
+};
+
 export default function MainLayout({ children }: MainLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    // Check for saved preference in localStorage if available
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('medibridge-sidebar-collapsed');
+      return saved === 'true';
+    }
+    return false;
+  });
+  
   const { loading, isAuthenticated } = useAuth();
   const [location, setLocation] = useLocation();
+  
+  // Toggle sidebar collapsed state
+  const toggleSidebar = () => {
+    const newState = !sidebarCollapsed;
+    setSidebarCollapsed(newState);
+    // Save preference to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('medibridge-sidebar-collapsed', String(newState));
+    }
+  };
   
   // Redirect to login if not authenticated - only once when component mounts
   useEffect(() => {
@@ -23,11 +49,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
       setLocation('/login');
     }
   }, [loading, isAuthenticated, setLocation]);
-
-  // Log current location for debugging
-  useEffect(() => {
-    console.log("Current location:", location);
-  }, [location]);
 
   if (loading) {
     return (
@@ -43,10 +64,17 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return null;
   }
 
+  // Update shared context object
+  SidebarContext.isSidebarCollapsed = sidebarCollapsed;
+  SidebarContext.toggleSidebar = toggleSidebar;
+
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-50 text-neutral-800">
       {/* Sidebar - hidden on mobile */}
-      <Sidebar />
+      <Sidebar 
+        isCollapsed={sidebarCollapsed} 
+        onToggleCollapse={toggleSidebar} 
+      />
       
       {/* Mobile header and menu */}
       <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-neutral-200 z-10">
@@ -84,9 +112,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        {children}
+        <main className="flex-1 overflow-y-auto p-6 transition-all duration-300">
+          {children}
+        </main>
         <MobileNav isMobileBar />
       </div>
+      
+      {/* Health Tips Component with playful character animations */}
+      <HealthTip position="bottom-right" autoShowInterval={180000} />
     </div>
   );
 }

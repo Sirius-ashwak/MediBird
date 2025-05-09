@@ -11,10 +11,42 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
+import { motion, AnimatePresence, Variant } from "framer-motion";
 
 import { ShieldCheckIcon } from "@/lib/icons";
 import { DataAccessProvider } from "@shared/schema";
 import { RiHospitalLine, RiUser6Line, RiTestTubeLine, RiAddLine, RiShieldKeyholeLine, RiTimeLine } from 'react-icons/ri';
+import { fadeInVariants, cardHoverVariants, pulseVariants, slideUpVariants } from "@/lib/animation-utils";
+
+// Animation variants for the list of providers
+const listContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const listItemVariants = {
+  hidden: (i: number) => ({
+    opacity: 0,
+    y: 20,
+    x: i % 2 === 0 ? -10 : 10 // Alternating left/right offset
+  }),
+  visible: {
+    opacity: 1,
+    y: 0,
+    x: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 24
+    }
+  }
+};
 
 // Helper functions for determining provider icons based on type
 function getProviderIcon(type: string): string {
@@ -92,6 +124,7 @@ function ProviderAccessCardModern({
   isBlockchainVerified = false
 }: ProviderAccessCardProps) {
   const [isActive, setIsActive] = useState(active);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleToggle = () => {
     setIsActive(!isActive);
@@ -99,88 +132,211 @@ function ProviderAccessCardModern({
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-200 group">
+    <motion.div 
+      className="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 group"
+      variants={cardHoverVariants}
+      initial="initial"
+      whileHover="hover"
+      whileTap={{ scale: 0.98 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      animate={{ 
+        boxShadow: isHovered 
+          ? "0 10px 30px rgba(0, 0, 0, 0.08)" 
+          : "0 2px 4px rgba(0, 0, 0, 0.05)" 
+      }}
+    >
       <div className="flex items-center space-x-4">
-        <div className={`w-12 h-12 rounded-lg ${
-          icon === "ri-hospital-line" ? "bg-gradient-to-br from-blue-400 to-blue-600" :
-          icon === "ri-user-6-line" ? "bg-gradient-to-br from-indigo-400 to-indigo-600" :
-          "bg-gradient-to-br from-orange-400 to-orange-600"
-        } flex items-center justify-center flex-shrink-0 shadow group-hover:shadow-lg transition-all duration-300`}>
-          {icon === "ri-hospital-line" && <RiHospitalLine className="text-white" size={22} />}
-          {icon === "ri-user-6-line" && <RiUser6Line className="text-white" size={22} />}
-          {icon === "ri-test-tube-line" && <RiTestTubeLine className="text-white" size={22} />}
-        </div>
+        <motion.div 
+          className={`w-12 h-12 rounded-lg ${
+            icon === "ri-hospital-line" ? "bg-gradient-to-br from-blue-400 to-blue-600" :
+            icon === "ri-user-6-line" ? "bg-gradient-to-br from-indigo-400 to-indigo-600" :
+            "bg-gradient-to-br from-orange-400 to-orange-600"
+          } flex items-center justify-center flex-shrink-0 shadow`}
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          animate={{ 
+            boxShadow: isHovered ? "0 8px 16px rgba(0, 0, 0, 0.1)" : "0 2px 4px rgba(0, 0, 0, 0.1)" 
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 15 }}
+        >
+          <motion.div
+            animate={isHovered ? { 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, 0],
+              transition: { 
+                duration: 1.5, 
+                repeat: 1,
+                repeatType: "reverse" 
+              }
+            } : {}}
+          >
+            {icon === "ri-hospital-line" && <RiHospitalLine className="text-white" size={22} />}
+            {icon === "ri-user-6-line" && <RiUser6Line className="text-white" size={22} />}
+            {icon === "ri-test-tube-line" && <RiTestTubeLine className="text-white" size={22} />}
+          </motion.div>
+        </motion.div>
+        
         <div className="flex-1">
           <div className="flex items-center mb-1">
-            <h4 className="font-semibold text-slate-800 dark:text-slate-200">{name}</h4>
+            <motion.h4 
+              className="font-semibold text-slate-800 dark:text-slate-200"
+              animate={{ 
+                color: isHovered ? "var(--primary-700)" : "var(--slate-800)" 
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              {name}
+            </motion.h4>
             {isBlockchainVerified && (
-              <Badge variant="outline" className="ml-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 shadow-sm">
-                <div className="flex items-center">
-                  <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.91 11.12C20.91 16.01 17.36 20.59 12.51 21.93C12.18 22.02 11.82 22.02 11.49 21.93C6.64 20.59 3.09 16.01 3.09 11.12V6.73C3.09 5.91 3.71 4.98 4.48 4.67L10.05 2.39C11.13 1.93 12.86 1.93 13.94 2.39L19.51 4.67C20.29 4.98 20.91 5.91 20.91 6.73V11.12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 12.5C13.1046 12.5 14 11.6046 14 10.5C14 9.39543 13.1046 8.5 12 8.5C10.8954 8.5 10 9.39543 10 10.5C10 11.6046 10.8954 12.5 12 12.5Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 12.5V15.5" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <span className="text-[10px] font-medium">Verified</span>
-                </div>
-              </Badge>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
+              >
+                <Badge variant="outline" className="ml-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 shadow-sm">
+                  <div className="flex items-center">
+                    <motion.svg 
+                      className="w-3 h-3 mr-1" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      xmlns="http://www.w3.org/2000/svg"
+                      animate={{ 
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 10, 0]
+                      }}
+                      transition={{ 
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                      }}
+                    >
+                      <path d="M20.91 11.12C20.91 16.01 17.36 20.59 12.51 21.93C12.18 22.02 11.82 22.02 11.49 21.93C6.64 20.59 3.09 16.01 3.09 11.12V6.73C3.09 5.91 3.71 4.98 4.48 4.67L10.05 2.39C11.13 1.93 12.86 1.93 13.94 2.39L19.51 4.67C20.29 4.98 20.91 5.91 20.91 6.73V11.12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 12.5C13.1046 12.5 14 11.6046 14 10.5C14 9.39543 13.1046 8.5 12 8.5C10.8954 8.5 10 9.39543 10 10.5C10 11.6046 10.8954 12.5 12 12.5Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 12.5V15.5" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                    </motion.svg>
+                    <span className="text-[10px] font-medium">Verified</span>
+                  </div>
+                </Badge>
+              </motion.div>
             )}
           </div>
           <div className="flex items-center">
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{status}</span>
             {daysLeft && (
-              <div className="flex items-center ml-3 text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-blue-800 shadow-sm">
-                <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <motion.div 
+                className="flex items-center ml-3 text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-blue-800 shadow-sm"
+                initial={{ opacity: 0, x: -5 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <motion.svg 
+                  className="w-3 h-3 mr-1" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  animate={{
+                    rotate: isHovered ? [0, 360] : 0
+                  }}
+                  transition={{
+                    duration: 2,
+                    ease: "easeInOut"
+                  }}
+                >
                   <path d="M22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2C17.52 2 22 6.48 22 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M15.71 15.18L12.61 13.33C12.07 13.01 11.63 12.24 11.63 11.61V7.51001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                </motion.svg>
                 <span>{daysLeft} days left</span>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
+        
         {isPending ? (
-          <Button 
-            onClick={onReview} 
-            size="sm" 
-            className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-md px-3 py-1.5 rounded-lg hover:shadow-lg transition-all"
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            Review
-          </Button>
+            <Button 
+              onClick={onReview} 
+              size="sm" 
+              className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-md px-3 py-1.5 rounded-lg hover:shadow-lg transition-all"
+            >
+              Review
+            </Button>
+          </motion.div>
         ) : (
-          <Switch 
-            checked={isActive} 
-            onCheckedChange={handleToggle}
-            className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-secondary-500 data-[state=checked]:to-secondary-600"
-          />
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Switch 
+              checked={isActive} 
+              onCheckedChange={handleToggle}
+              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-secondary-500 data-[state=checked]:to-secondary-600"
+            />
+          </motion.div>
         )}
       </div>
       
-      <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <motion.div 
+        className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+      >
         <div className="flex flex-wrap gap-1.5 mb-2">
-          {accessTo.map((item, index) => (
-            <Badge 
-              key={index} 
-              variant="outline" 
-              className="bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 shadow-sm"
-            >
-              {item}
-            </Badge>
-          ))}
+          <AnimatePresence>
+            {accessTo.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05, type: "spring" }}
+                whileHover={{ scale: 1.1 }}
+              >
+                <Badge 
+                  variant="outline" 
+                  className="bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600 shadow-sm"
+                >
+                  {item}
+                </Badge>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
         
         {isBlockchainVerified && (
-          <p className="mt-1 text-emerald-600 dark:text-emerald-400 text-xs font-medium flex items-center">
-            <svg className="w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <motion.p 
+            className="mt-1 text-emerald-600 dark:text-emerald-400 text-xs font-medium flex items-center"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <motion.svg 
+              className="w-3.5 h-3.5 mr-1.5" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              animate={isHovered ? { 
+                y: [0, -2, 0],
+                rotate: [0, 5, 0]
+              } : {}}
+              transition={{ 
+                duration: 1.5, 
+                repeat: isHovered ? 1 : 0,
+                repeatType: "reverse" 
+              }}
+            >
               <path d="M3.17004 7.43994L12 12.5499L20.77 7.46991" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M12 21.61V12.54" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M10.93 2.48L5.59 5.44001C4.38 6.11001 3.39 7.79001 3.39 9.17001V14.82C3.39 16.2 4.38 17.88 5.59 18.55L10.94 21.52C12.1 22.15 13.9 22.15 15.06 21.52L20.41 18.55C21.62 17.88 22.61 16.2 22.61 14.82V9.17001C22.61 7.79001 21.62 6.11001 20.41 5.44001L15.06 2.47C13.9 1.84 12.1 1.84 10.93 2.48Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            </motion.svg>
             Cryptographically secured on blockchain
-          </p>
+          </motion.p>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -313,61 +469,202 @@ export default function DataAccessControl() {
               </div>
             </div>
           ) : providers.length > 0 ? (
-            <>
-              {providers.map((provider: DataAccessProvider) => (
-                <ProviderAccessCardModern
+            <motion.div
+              variants={listContainerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {providers.map((provider: DataAccessProvider, index) => (
+                <motion.div
                   key={provider.id}
-                  icon={getProviderIcon(provider.type || 'hospital')}
-                  iconBg={getProviderIconBg(provider.type || 'hospital')}
-                  iconColor={getProviderIconColor(provider.type || 'hospital')}
-                  name={provider.name}
-                  status={provider.status === 'approved' ? 'Active permission' : 
-                         provider.status === 'pending' ? 'Pending request' : 'Inactive'}
-                  daysLeft={provider.daysLeft}
-                  active={provider.active}
-                  isPending={provider.status === 'pending'}
-                  accessTo={Array.isArray(provider.accessTo) ? provider.accessTo : []}
-                  onToggle={(active) => toggleAccess.mutate({ id: provider.id.toString(), active })}
-                  onReview={() => {}}
-                  isBlockchainVerified={Boolean(provider.blockchainHash)}
-                />
+                  variants={listItemVariants}
+                  custom={index}
+                  transition={{ 
+                    delay: index * 0.1,
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 24 
+                  }}
+                >
+                  <ProviderAccessCardModern
+                    icon={getProviderIcon(provider.type || 'hospital')}
+                    iconBg={getProviderIconBg(provider.type || 'hospital')}
+                    iconColor={getProviderIconColor(provider.type || 'hospital')}
+                    name={provider.name}
+                    status={provider.status === 'approved' ? 'Active permission' : 
+                           provider.status === 'pending' ? 'Pending request' : 'Inactive'}
+                    daysLeft={provider.daysLeft}
+                    active={provider.active}
+                    isPending={provider.status === 'pending'}
+                    accessTo={Array.isArray(provider.accessTo) ? provider.accessTo : []}
+                    onToggle={(active) => toggleAccess.mutate({ id: provider.id.toString(), active })}
+                    onReview={() => {}}
+                    isBlockchainVerified={Boolean(provider.blockchainHash)}
+                  />
+                </motion.div>
               ))}
-            </>
+            </motion.div>
           ) : (
-            <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-              <div className="mx-auto h-16 w-16 rounded-full bg-secondary-50 dark:bg-secondary-900/30 flex items-center justify-center">
-                <RiShieldKeyholeLine className="h-8 w-8 text-secondary-300 dark:text-secondary-700" />
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-slate-800 dark:text-slate-200">No active permissions</h3>
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">You haven't granted any data access permissions yet.</p>
-              <Button 
-                className="mt-5 bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white shadow-md hover:shadow-lg transition-all"
-                onClick={() => setIsDialogOpen(true)}
+            <motion.div 
+              className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 24,
+                delay: 0.2
+              }}
+            >
+              <motion.div 
+                className="mx-auto h-16 w-16 rounded-full bg-secondary-50 dark:bg-secondary-900/30 flex items-center justify-center"
+                initial={{ scale: 0, rotate: -45 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 260, 
+                  damping: 20,
+                  delay: 0.3
+                }}
+                whileHover={{ 
+                  scale: 1.1, 
+                  rotate: 5,
+                  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)"
+                }}
               >
-                <RiAddLine className="mr-2 h-4 w-4" />
-                Grant Access
-              </Button>
-            </div>
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.15, 1],
+                    rotate: [0, 10, 0]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatType: "reverse"
+                  }}
+                >
+                  <RiShieldKeyholeLine className="h-8 w-8 text-secondary-400 dark:text-secondary-600" />
+                </motion.div>
+              </motion.div>
+              
+              <motion.h3 
+                className="mt-4 text-base font-semibold text-slate-800 dark:text-slate-200"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                No active permissions
+              </motion.h3>
+              
+              <motion.p 
+                className="mt-2 text-sm text-slate-500 dark:text-slate-400"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                You haven't granted any data access permissions yet.
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button 
+                  className="mt-5 bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white shadow-md hover:shadow-lg transition-all"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  <motion.div
+                    animate={{ 
+                      rotate: [0, 10, 0],
+                      scale: [1, 1.2, 1]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      repeatDelay: 3
+                    }}
+                    className="mr-2"
+                  >
+                    <RiAddLine className="h-4 w-4" />
+                  </motion.div>
+                  Grant Access
+                </Button>
+              </motion.div>
+            </motion.div>
           )}
         </div>
         
-        <div className="mt-5">
+        <motion.div 
+          className="mt-5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="w-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm">
-                <RiAddLine className="mr-2" size={16} />
-                Manage Data Access
-              </Button>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              >
+                <Button 
+                  variant="outline" 
+                  className="w-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm group"
+                >
+                  <motion.div
+                    animate={{ 
+                      rotate: [0, 0, 180, 180, 0],
+                      scale: [1, 1, 1.3, 1.3, 1]
+                    }}
+                    transition={{ 
+                      duration: 4,
+                      repeat: Infinity,
+                      repeatDelay: 5,
+                      times: [0, 0.4, 0.5, 0.9, 1] 
+                    }}
+                    className="mr-2"
+                  >
+                    <RiAddLine size={16} />
+                  </motion.div>
+                  Manage Data Access
+                </Button>
+              </motion.div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[480px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl">
               <DialogHeader>
-                <DialogTitle className="text-slate-800 dark:text-white text-xl">Grant Selective Data Access</DialogTitle>
-                <DialogDescription className="text-slate-600 dark:text-slate-400">
-                  Use blockchain-secured permissions to grant providers access to specific data categories.
-                </DialogDescription>
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <DialogTitle className="text-slate-800 dark:text-white text-xl">Grant Selective Data Access</DialogTitle>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.3 }}
+                >
+                  <DialogDescription className="text-slate-600 dark:text-slate-400">
+                    Use blockchain-secured permissions to grant providers access to specific data categories.
+                  </DialogDescription>
+                </motion.div>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
+              <motion.div 
+                className="grid gap-4 py-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+              >
+                <motion.div 
+                  className="grid gap-2"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.3 }}
+                >
                   <Label htmlFor="provider" className="text-slate-700 dark:text-slate-300">Healthcare Provider</Label>
                   <Select value={selectedProvider?.toString()} onValueChange={(value) => setSelectedProvider(parseInt(value))}>
                     <SelectTrigger className="border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-sm">
@@ -376,7 +673,15 @@ export default function DataAccessControl() {
                     <SelectContent className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                       {isProvidersLoading ? (
                         <div className="flex justify-center p-2">
-                          <div className="h-5 w-5 rounded-full border-t-2 border-b-2 border-secondary-500 animate-spin"></div>
+                          <motion.div 
+                            className="h-5 w-5 rounded-full border-t-2 border-b-2 border-secondary-500"
+                            animate={{ rotate: 360 }}
+                            transition={{ 
+                              duration: 1, 
+                              ease: "linear", 
+                              repeat: Infinity 
+                            }}
+                          ></motion.div>
                         </div>
                       ) : (
                         Array.isArray(allProviders) 
@@ -395,30 +700,54 @@ export default function DataAccessControl() {
                       )}
                     </SelectContent>
                   </Select>
-                </div>
+                </motion.div>
                 
-                <div className="grid gap-2">
+                <motion.div 
+                  className="grid gap-2"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.3 }}
+                >
                   <Label className="text-slate-700 dark:text-slate-300">Data Categories</Label>
                   <div className="grid grid-cols-2 gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50">
-                    {availableDataTypes.map((dataType) => (
-                      <div key={dataType} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`data-type-${dataType}`} 
-                          checked={selectedDataTypes.includes(dataType)}
-                          onCheckedChange={(checked) => 
-                            handleDataTypeChange(dataType, checked === true)
-                          }
-                          className="border-slate-300 dark:border-slate-600 data-[state=checked]:bg-secondary-600 data-[state=checked]:border-secondary-600"
-                        />
-                        <Label htmlFor={`data-type-${dataType}`} className="text-sm font-normal text-slate-700 dark:text-slate-300">
-                          {dataType}
-                        </Label>
-                      </div>
-                    ))}
+                    <AnimatePresence>
+                      {availableDataTypes.map((dataType, index) => (
+                        <motion.div 
+                          key={dataType} 
+                          className="flex items-center space-x-2"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ 
+                            delay: 0.5 + (index * 0.05), 
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 25 
+                          }}
+                          whileHover={{ scale: 1.02, x: 3 }}
+                        >
+                          <Checkbox 
+                            id={`data-type-${dataType}`} 
+                            checked={selectedDataTypes.includes(dataType)}
+                            onCheckedChange={(checked) => 
+                              handleDataTypeChange(dataType, checked === true)
+                            }
+                            className="border-slate-300 dark:border-slate-600 data-[state=checked]:bg-secondary-600 data-[state=checked]:border-secondary-600"
+                          />
+                          <Label htmlFor={`data-type-${dataType}`} className="text-sm font-normal text-slate-700 dark:text-slate-300">
+                            {dataType}
+                          </Label>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
-                </div>
+                </motion.div>
                 
-                <div className="grid gap-2">
+                <motion.div 
+                  className="grid gap-2"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9, duration: 0.3 }}
+                >
                   <Label htmlFor="duration" className="text-slate-700 dark:text-slate-300">Access Duration (days)</Label>
                   <Select value={accessDuration} onValueChange={setAccessDuration}>
                     <SelectTrigger className="border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-sm">
@@ -432,39 +761,93 @@ export default function DataAccessControl() {
                       <SelectItem value="365">1 year</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </motion.div>
                 
-                <div className="flex p-4 rounded-xl bg-gradient-to-r from-blue-50 to-violet-50 dark:from-blue-900/20 dark:to-violet-900/20 border border-blue-100 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-sm">
-                  <AlertCircle size={20} className="mr-3 shrink-0 mt-0.5 text-blue-500 dark:text-blue-400" />
+                <motion.div 
+                  className="flex p-4 rounded-xl bg-gradient-to-r from-blue-50 to-violet-50 dark:from-blue-900/20 dark:to-violet-900/20 border border-blue-100 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-sm"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.0, duration: 0.3 }}
+                  whileHover={{ 
+                    boxShadow: "0 4px 12px rgba(59, 130, 246, 0.15)",
+                    scale: 1.01
+                  }}
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1, rotate: [0, 10, 0] }}
+                    transition={{ 
+                      delay: 1.1, 
+                      duration: 0.5,
+                      type: "spring"
+                    }}
+                  >
+                    <AlertCircle size={20} className="mr-3 shrink-0 mt-0.5 text-blue-500 dark:text-blue-400" />
+                  </motion.div>
                   <p className="leading-relaxed">
                     Access permissions are secured with blockchain technology and cryptographic verification. The provider will only have access to the selected data types for the specified duration.
                   </p>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
               <DialogFooter className="flex flex-col sm:flex-row gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsDialogOpen(false)}
-                  className="border-slate-300 dark:border-slate-600"
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={() => grantBlockchainAccess.mutate()}
-                  disabled={grantBlockchainAccess.isPending || !selectedProvider || selectedDataTypes.length === 0}
-                  className="bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white"
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsDialogOpen(false)}
+                    className="border-slate-300 dark:border-slate-600"
+                  >
+                    Cancel
+                  </Button>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  {grantBlockchainAccess.isPending ? (
-                    <div className="h-5 w-5 rounded-full border-2 border-secondary-200 border-t-secondary-600 animate-spin mr-2"></div>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2">
-                      <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M8.5 12H15.5" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12 15.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                  Grant Access
-                </Button>
+                  <Button 
+                    onClick={() => grantBlockchainAccess.mutate()}
+                    disabled={grantBlockchainAccess.isPending || !selectedProvider || selectedDataTypes.length === 0}
+                    className="bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white"
+                  >
+                    {grantBlockchainAccess.isPending ? (
+                      <motion.div 
+                        className="h-5 w-5 rounded-full border-2 border-secondary-200 border-t-secondary-600 mr-2"
+                        animate={{ rotate: 360 }}
+                        transition={{ 
+                          duration: 0.8, 
+                          ease: "linear", 
+                          repeat: Infinity 
+                        }}
+                      ></motion.div>
+                    ) : (
+                      <motion.svg 
+                        width="18" 
+                        height="18" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="mr-2"
+                        animate={{ 
+                          rotate: [0, 0, 90, 90, 0],
+                          scale: [1, 1, 1.2, 1.2, 1] 
+                        }}
+                        transition={{ 
+                          duration: 3,
+                          repeat: Infinity,
+                          repeatDelay: 2,
+                          times: [0, 0.4, 0.5, 0.9, 1]
+                        }}
+                      >
+                        <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M8.5 12H15.5" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 15.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                      </motion.svg>
+                    )}
+                    Grant Access
+                  </Button>
+                </motion.div>
               </DialogFooter>
             </DialogContent>
           </Dialog>

@@ -7,6 +7,14 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
 import { AIIcon, SendIcon, InformationIcon, SettingsIcon, ShieldCheckIcon } from "@/lib/icons";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  fadeInVariants, 
+  slideUpVariants, 
+  pulseVariants,
+  buttonHoverVariants,
+  expandVariants
+} from "@/lib/animation-utils";
 
 interface Message {
   id: string;
@@ -91,146 +99,411 @@ export default function AIConsultation() {
   ];
 
   return (
-    <Card className="overflow-hidden border-slate-200 dark:border-slate-700 shadow-lg relative bg-white dark:bg-slate-800">
-      {/* Background gradient pattern for sophistication */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-50/30 to-transparent dark:from-accent-900/10 pointer-events-none"></div>
-      
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/95 relative z-10">
-        <div className="flex items-center">
-          <div className="w-10 h-10 mr-3 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex-shrink-0 flex items-center justify-center shadow-md">
-            <AIIcon className="text-white h-5 w-5" />
-          </div>
-          <CardTitle className="text-lg font-display tracking-tight text-slate-800 dark:text-white">AI Health Consultation</CardTitle>
-        </div>
-        <Badge variant="secondary" className="bg-accent-100 dark:bg-accent-900/70 text-accent-700 dark:text-accent-300 px-3 py-1 rounded-full flex items-center gap-1.5 font-medium">
-          <span className="flex h-1.5 w-1.5 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-500 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-600"></span>
-          </span>
-          <span>Powered by Gemini AI</span>
-        </Badge>
-      </CardHeader>
-      
-      <CardContent className="p-0 relative z-10">
-        <div className="border-x border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="bg-slate-50 dark:bg-slate-800/80 p-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center shadow-sm">
-                <AIIcon className="text-white h-4 w-4" />
-              </div>
-              <span className="font-medium text-sm text-slate-800 dark:text-slate-200">MediBridge Assistant</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="icon" className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full">
-                <InformationIcon className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full">
-                <SettingsIcon className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          
-          {/* Chat messages with enhanced styling */}
-          <div className="p-5 max-h-80 overflow-y-auto space-y-4 bg-white dark:bg-slate-800/30 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAyIj48cGF0aCBkPSJNMCAwaDQwdjQwaC00MHoiPjwvcGF0aD48L2c+PC9nPjwvc3ZnPg==')] dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjAzIj48cGF0aCBkPSJNMCAwaDQwdjQwaC00MHoiPjwvcGF0aD48L2c+PC9nPjwvc3ZnPg==')]">
-            {messages.map((message) => (
-              <div 
-                key={message.id} 
-                className={`flex items-start ${message.sender === 'ai' ? 'space-x-3' : 'justify-end space-x-3'}`}
-              >
-                {message.sender === 'ai' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex-shrink-0 flex items-center justify-center shadow-sm">
-                    <AIIcon className="text-white h-4 w-4" />
-                  </div>
-                )}
-                
-                <div className={`${
-                  message.sender === 'ai' 
-                    ? 'bg-slate-100 dark:bg-slate-700/70 text-slate-800 dark:text-slate-200 shadow-sm' 
-                    : 'bg-primary-50 dark:bg-primary-900/30 text-slate-800 dark:text-slate-200 shadow-sm'
-                } rounded-2xl p-4 max-w-[80%] backdrop-blur-sm backdrop-saturate-150`}>
-                  <p className="text-sm whitespace-pre-line leading-relaxed">{message.content}</p>
-                  {message.sender === 'ai' && message.id === 'welcome' && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 border-t border-slate-200 dark:border-slate-600 pt-2">
-                      Note: This is preliminary information and not a medical diagnosis.
-                    </p>
-                  )}
-                </div>
-                
-                {message.sender === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex-shrink-0 flex items-center justify-center shadow-sm">
-                    <span className="text-white text-xs font-medium">
-                      {/* User initials - would be dynamic in a real app */}
-                      SJ
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
-            
-            {sendMessage.isPending && (
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex-shrink-0 flex items-center justify-center shadow-sm">
-                  <AIIcon className="text-white h-4 w-4" />
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-700/70 rounded-2xl p-3 shadow-sm">
-                  <div className="flex space-x-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-500 animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-          
-          {/* Input area with enhanced styling */}
-          <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm backdrop-saturate-150">
-            <form onSubmit={handleSendMessage} className="flex flex-col space-y-3">
-              <div className="flex items-center space-x-2">
-                <Input 
-                  type="text" 
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  className="flex-1 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200" 
-                  placeholder="Type your health concern..." 
-                />
-                <Button 
-                  type="submit"
-                  disabled={sendMessage.isPending || !input.trim()}
-                  className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-2.5 rounded-full hover:from-primary-600 hover:to-primary-700 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:shadow-none"
-                >
-                  <SendIcon className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                {quickPhrases.map(phrase => (
-                  <Button
-                    key={phrase.id}
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setInput(phrase.text)}
-                    className="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full text-xs hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 shadow-sm"
-                  >
-                    {phrase.text}
-                  </Button>
-                ))}
-              </div>
-            </form>
-          </div>
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        type: "spring", 
+        damping: 20, 
+        stiffness: 300,
+        duration: 0.5 
+      }}
+    >
+      <Card className="overflow-hidden border-slate-200 dark:border-slate-700 shadow-lg relative bg-white dark:bg-slate-800">
+        {/* Background gradient pattern for sophistication */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-br from-accent-50/30 to-transparent dark:from-accent-900/10 pointer-events-none"
+          animate={{ 
+            opacity: [0.3, 0.5, 0.3],
+            background: [
+              "linear-gradient(to bottom right, rgba(123, 97, 255, 0.03), transparent)",
+              "linear-gradient(to bottom right, rgba(123, 97, 255, 0.08), transparent)",
+              "linear-gradient(to bottom right, rgba(123, 97, 255, 0.03), transparent)"
+            ]
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        />
         
-        {/* Security footer with enhanced styling */}
-        <div className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700">
-          <div className="flex items-center space-x-1.5 bg-white dark:bg-slate-700/50 px-3 py-1.5 rounded-full shadow-sm">
-            <ShieldCheckIcon className="h-3.5 w-3.5 text-green-500 dark:text-green-400" />
-            <span className="font-medium">Encrypted with Zero-Knowledge Proofs</span>
+        {/* Card Header with animations */}
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/95 relative z-10">
+          <div className="flex items-center">
+            <motion.div 
+              className="w-10 h-10 mr-3 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex-shrink-0 flex items-center justify-center shadow-md"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ rotate: -5, scale: 0.9 }}
+              animate={{ rotate: 0, scale: 1 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 15,
+                duration: 0.5 
+              }}
+            >
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, 0]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              >
+                <AIIcon className="text-white h-5 w-5" />
+              </motion.div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
+            >
+              <CardTitle className="text-lg font-display tracking-tight text-slate-800 dark:text-white">AI Health Consultation</CardTitle>
+            </motion.div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+          >
+            <Badge variant="secondary" className="bg-accent-100 dark:bg-accent-900/70 text-accent-700 dark:text-accent-300 px-3 py-1 rounded-full flex items-center gap-1.5 font-medium">
+              <motion.span 
+                className="flex h-1.5 w-1.5 relative"
+                variants={pulseVariants}
+                initial="initial"
+                animate="pulse"
+              >
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-600"></span>
+              </motion.span>
+              <span>Powered by Gemini AI</span>
+            </Badge>
+          </motion.div>
+        </CardHeader>
+      
+        <CardContent className="p-0 relative z-10">
+          <div className="border-x border-slate-200 dark:border-slate-700 overflow-hidden">
+            {/* Chat header */}
+            <div className="bg-slate-50 dark:bg-slate-800/80 p-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <motion.div 
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center shadow-sm"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                >
+                  <AIIcon className="text-white h-4 w-4" />
+                </motion.div>
+                <span className="font-medium text-sm text-slate-800 dark:text-slate-200">MediBridge Assistant</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button variant="ghost" size="icon" className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full">
+                    <InformationIcon className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button variant="ghost" size="icon" className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full">
+                    <SettingsIcon className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+            
+            {/* Chat messages with enhanced styling */}
+            <motion.div 
+              className="p-5 max-h-80 overflow-y-auto space-y-4 bg-white dark:bg-slate-800/30 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAyIj48cGF0aCBkPSJNMCAwaDQwdjQwaC00MHoiPjwvcGF0aD48L2c+PC9nPjwvc3ZnPg==')] dark:bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjAzIj48cGF0aCBkPSJNMCAwaDQwdjQwaC00MHoiPjwvcGF0aD48L2c+PC9nPjwvc3ZnPg==')]"
+              variants={fadeInVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.2 }}
+            >
+              <AnimatePresence mode="popLayout">
+                {messages.map((message, index) => (
+                  <motion.div 
+                    key={message.id} 
+                    className={`flex items-start ${message.sender === 'ai' ? 'space-x-3' : 'justify-end space-x-3'}`}
+                    initial={{ 
+                      opacity: 0, 
+                      y: 20,
+                      scale: 0.95,
+                      x: message.sender === 'user' ? 20 : -20 
+                    }}
+                    animate={{ 
+                      opacity: 1, 
+                      y: 0,
+                      scale: 1,
+                      x: 0,
+                      transition: { 
+                        type: "spring",
+                        damping: 25,
+                        stiffness: 300,
+                        delay: index * 0.05
+                      }
+                    }}
+                    exit={{ 
+                      opacity: 0,
+                      scale: 0.9,
+                      transition: { duration: 0.1 }
+                    }}
+                  >
+                    {message.sender === 'ai' && (
+                      <motion.div 
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex-shrink-0 flex items-center justify-center shadow-sm"
+                        initial={{ rotate: -10, scale: 0.9 }}
+                        animate={{ rotate: 0, scale: 1 }}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 15
+                        }}
+                      >
+                        <AIIcon className="text-white h-4 w-4" />
+                      </motion.div>
+                    )}
+                    
+                    <motion.div 
+                      className={`${
+                        message.sender === 'ai' 
+                          ? 'bg-slate-100 dark:bg-slate-700/70 text-slate-800 dark:text-slate-200 shadow-sm' 
+                          : 'bg-primary-50 dark:bg-primary-900/30 text-slate-800 dark:text-slate-200 shadow-sm'
+                      } rounded-2xl p-4 max-w-[80%] backdrop-blur-sm backdrop-saturate-150`}
+                      whileHover={{ 
+                        scale: 1.02,
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                        transition: { type: "spring", stiffness: 400 }
+                      }}
+                    >
+                      <motion.p 
+                        className="text-sm whitespace-pre-line leading-relaxed"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        {message.content}
+                      </motion.p>
+                      
+                      {message.sender === 'ai' && message.id === 'welcome' && (
+                        <motion.p 
+                          className="text-xs text-slate-500 dark:text-slate-400 mt-2 border-t border-slate-200 dark:border-slate-600 pt-2"
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          Note: This is preliminary information and not a medical diagnosis.
+                        </motion.p>
+                      )}
+                    </motion.div>
+                    
+                    {message.sender === 'user' && (
+                      <motion.div 
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex-shrink-0 flex items-center justify-center shadow-sm"
+                        whileHover={{ scale: 1.1 }}
+                        initial={{ rotate: 10, scale: 0.9 }}
+                        animate={{ rotate: 0, scale: 1 }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 15
+                        }}
+                      >
+                        <span className="text-white text-xs font-medium">
+                          {/* User initials - would be dynamic in a real app */}
+                          SJ
+                        </span>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              
+              {/* Typing indicator animation */}
+              {sendMessage.isPending && (
+                <motion.div 
+                  className="flex items-start space-x-3"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div 
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex-shrink-0 flex items-center justify-center shadow-sm"
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      rotate: [0, 5, 0]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }}
+                  >
+                    <AIIcon className="text-white h-4 w-4" />
+                  </motion.div>
+                  <motion.div 
+                    className="bg-slate-100 dark:bg-slate-700/70 rounded-2xl p-3 shadow-sm"
+                    animate={{ 
+                      boxShadow: [
+                        "0 2px 4px rgba(0, 0, 0, 0.05)",
+                        "0 4px 8px rgba(0, 0, 0, 0.1)",
+                        "0 2px 4px rgba(0, 0, 0, 0.05)"
+                      ]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }}
+                  >
+                    <div className="flex space-x-1">
+                      <motion.div 
+                        className="w-1.5 h-1.5 rounded-full bg-accent-500" 
+                        animate={{ 
+                          y: ["0%", "-50%", "0%"],
+                          opacity: [1, 0.5, 1]
+                        }}
+                        transition={{ 
+                          duration: 0.8, 
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                          ease: "easeInOut",
+                          delay: 0
+                        }}
+                      />
+                      <motion.div 
+                        className="w-1.5 h-1.5 rounded-full bg-accent-500" 
+                        animate={{ 
+                          y: ["0%", "-50%", "0%"],
+                          opacity: [1, 0.5, 1]
+                        }}
+                        transition={{ 
+                          duration: 0.8, 
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                          ease: "easeInOut",
+                          delay: 0.1
+                        }}
+                      />
+                      <motion.div 
+                        className="w-1.5 h-1.5 rounded-full bg-accent-500" 
+                        animate={{ 
+                          y: ["0%", "-50%", "0%"],
+                          opacity: [1, 0.5, 1]
+                        }}
+                        transition={{ 
+                          duration: 0.8, 
+                          repeat: Infinity,
+                          repeatType: "reverse",
+                          ease: "easeInOut",
+                          delay: 0.2
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+              
+              <div ref={messagesEndRef} />
+            </motion.div>
+            
+            {/* Input area with micro-animations */}
+            <motion.div 
+              className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm backdrop-saturate-150"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
+            >
+              <form onSubmit={handleSendMessage} className="flex flex-col space-y-3">
+                <div className="flex items-center space-x-2">
+                  <motion.div 
+                    className="flex-1" 
+                    whileTap={{ scale: 0.99 }}
+                  >
+                    <Input 
+                      type="text" 
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      className="flex-1 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200" 
+                      placeholder="Type your health concern..." 
+                    />
+                  </motion.div>
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    <Button 
+                      type="submit"
+                      disabled={sendMessage.isPending || !input.trim()}
+                      className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-2.5 rounded-full hover:from-primary-600 hover:to-primary-700 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:shadow-none"
+                    >
+                      <SendIcon className="h-4 w-4" />
+                    </Button>
+                  </motion.div>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {quickPhrases.map((phrase, index) => (
+                    <motion.div
+                      key={phrase.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + (index * 0.05) }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setInput(phrase.text)}
+                        className="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full text-xs hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 shadow-sm"
+                      >
+                        {phrase.text}
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+              </form>
+            </motion.div>
+          </div>
+          
+          {/* Security footer with enhanced styling */}
+          <motion.div 
+            className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <motion.div 
+              className="flex items-center space-x-1.5 bg-white dark:bg-slate-700/50 px-3 py-1.5 rounded-full shadow-sm"
+              whileHover={{ 
+                scale: 1.03, 
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)" 
+              }}
+            >
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 10, 0]
+                }}
+                transition={{ 
+                  duration: 3,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              >
+                <ShieldCheckIcon className="h-3.5 w-3.5 text-green-500 dark:text-green-400" />
+              </motion.div>
+              <span className="font-medium">Encrypted with Zero-Knowledge Proofs</span>
+            </motion.div>
+          </motion.div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
