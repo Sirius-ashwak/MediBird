@@ -9,6 +9,7 @@ interface AuthContextType {
   error: string | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  updateUser: (updatedUser: User) => void;
   isAuthenticated: boolean;
 }
 
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   error: null,
   login: async () => false,
   logout: async () => {},
+  updateUser: () => {},
   isAuthenticated: false,
 });
 
@@ -170,6 +172,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Function to update user information locally
+  const updateUser = (updatedUser: User) => {
+    // In a real application, we would also send this update to the backend
+    // For now, we'll just update the local state
+    setUser(updatedUser);
+    console.log("User updated:", updatedUser);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -178,6 +188,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         error,
         login,
         logout,
+        updateUser,
         isAuthenticated: !!user,
       }}
     >

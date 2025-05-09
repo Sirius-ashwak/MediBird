@@ -12,6 +12,8 @@ import Providers from "@/pages/Providers";
 import BlockchainLogs from "@/pages/BlockchainLogs";
 import WebSocketDemo from "@/pages/WebSocketDemo";
 import WelcomePage from "@/pages/WelcomePage";
+import Settings from "@/pages/Settings";
+import Notifications from "@/pages/Notifications";
 import MainLayout from "@/layouts/MainLayout";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
@@ -49,6 +51,12 @@ function Router() {
           </Route>
           <Route path="/websocket">
             <WebSocketDemo />
+          </Route>
+          <Route path="/settings">
+            <Settings />
+          </Route>
+          <Route path="/notifications">
+            <Notifications />
           </Route>
           <Route>
             <NotFound />

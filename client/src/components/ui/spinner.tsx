@@ -1,24 +1,24 @@
-import React from 'react';
-import { Loader2 as LoaderIcon } from 'lucide-react';
+import { cn } from "@/lib/utils";
 
-export interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
+interface SpinnerProps {
+  size?: "sm" | "md" | "lg";
   className?: string;
 }
 
-export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '' }) => {
-  const sizeMap = {
-    sm: 16,
-    md: 24,
-    lg: 36,
+export function Spinner({ size = "md", className }: SpinnerProps) {
+  const sizeClasses = {
+    sm: "h-4 w-4 border-2",
+    md: "h-6 w-6 border-2",
+    lg: "h-8 w-8 border-3",
   };
-  
+
   return (
-    <LoaderIcon 
-      size={sizeMap[size]} 
-      className={`animate-spin text-primary ${className}`}
+    <div
+      className={cn(
+        "animate-spin rounded-full border-primary-200 border-t-primary-600",
+        sizeClasses[size],
+        className
+      )}
     />
   );
-};
-
-export default Spinner;
+}

@@ -1106,8 +1106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Start the server
   const port = parseInt(process.env.PORT || '5000');
-  httpServer.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+  const host = process.env.HOST || '0.0.0.0'; // Bind to all network interfaces by default
+  httpServer.listen(port, host, () => {
+    console.log(`Server running on ${host}:${port}`);
   });
 
   return httpServer;

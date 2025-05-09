@@ -603,6 +603,8 @@ export class MemStorage implements IStorage {
           daysLeft: daysLeft && daysLeft > 0 ? daysLeft : undefined,
           accessTo: consent.dataType.split(","),
           active: consent.active,
+          blockchainHash: consent.blockchainHash,
+          blockchainTimestamp: consent.blockchainTimestamp
         };
       }),
     );

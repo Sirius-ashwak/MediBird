@@ -70,10 +70,14 @@ export default function DataAccessControl() {
   
   const { data: providers = [], isLoading } = useQuery<DataAccessProvider[]>({
     queryKey: ["/api/consent/providers"],
+    // Add default empty array to prevent null issues
+    select: (data) => data || []
   });
   
   const { data: allProviders = [], isLoading: isProvidersLoading } = useQuery<any[]>({
     queryKey: ["/api/providers"],
+    // Add default empty array to prevent null issues
+    select: (data) => data || []
   });
 
   const toggleAccess = useMutation({
@@ -335,7 +339,7 @@ function ProviderAccessCard({
   daysLeft,
   active = false,
   isPending = false,
-  accessTo,
+  accessTo = [], // Default to empty array if not provided
   onToggle,
   onReview,
   isBlockchainVerified = false

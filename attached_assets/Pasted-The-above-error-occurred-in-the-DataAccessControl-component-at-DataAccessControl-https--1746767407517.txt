@@ -1,0 +1,24 @@
+The above error occurred in the <DataAccessControl> component:
+
+    at DataAccessControl (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/src/components/dashboard/DataAccessControl.tsx:77:43)
+    at div
+    at div
+    at main
+    at Dashboard (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/src/pages/Dashboard.tsx:34:20)
+    at Route (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=df213fa6:338:16)
+    at Switch (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=df213fa6:394:17)
+    at div
+    at div
+    at MainLayout (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/src/layouts/MainLayout.tsx:26:38)
+    at Router (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/src/App.tsx?v=80kLQhZGLtzhmw9TikO-u:39:40)
+    at Provider (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VJRUVGTI.js?v=df213fa6:38:15)
+    at TooltipProvider (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=df213fa6:61:5)
+    at AuthProvider (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/src/context/AuthContext.tsx:34:32)
+    at V (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=df213fa6:44:25)
+    at J (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=df213fa6:42:18)
+    at QueryClientProvider (https://14ae63c1-aecb-48ac-9eda-1c01c9161827-00-hx39eeqpx6nn.pike.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=df213fa6:2875:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+Cannot read properties of null (reading 'length')

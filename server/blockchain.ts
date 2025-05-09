@@ -15,11 +15,21 @@ let apiInstance: ApiPromise | null = null;
 let apiConnected = false;
 let connectionAttempted = false;
 
+// Helper function to validate WebSocket URL
+function isValidWsUrl(url: any): boolean {
+  if (typeof url !== 'string') return false;
+  try {
+    return url.startsWith('ws://') || url.startsWith('wss://');
+  } catch (e) {
+    return false;
+  }
+}
+
 // Polkadot network configuration
 const NETWORK_CONFIG = {
   // Primary endpoint with fallbacks
   endpoints: [
-    typeof process.env.POLKADOT_ENDPOINT === 'string' && process.env.POLKADOT_ENDPOINT.startsWith('wss://') 
+    isValidWsUrl(process.env.POLKADOT_ENDPOINT) 
       ? process.env.POLKADOT_ENDPOINT 
       : 'wss://westend-rpc.polkadot.io',
     'wss://westend-rpc.dwellir.com',
@@ -42,9 +52,8 @@ async function getPolkadotApi(): Promise<ApiPromise> {
     // Try each endpoint in order until one works
     for (const endpoint of NETWORK_CONFIG.endpoints) {
       try {
-        // Verify the endpoint is a valid WebSocket URL
-        if (!endpoint || typeof endpoint !== 'string' || 
-            !(endpoint.startsWith('ws://') || endpoint.startsWith('wss://'))) {
+        // Verify the endpoint is a valid WebSocket URL using our helper
+        if (!isValidWsUrl(endpoint)) {
           console.error(`Invalid Polkadot endpoint: ${endpoint}, must be a ws:// or wss:// URL`);
           continue; // Skip to next endpoint
         }

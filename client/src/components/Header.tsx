@@ -38,11 +38,21 @@ export default function Header() {
             />
             <SearchIcon className="text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
           </div>
-          <Button variant="ghost" size="icon" className="p-2 rounded-full bg-neutral-100 text-neutral-600 hover:bg-neutral-200 relative">
+          <Button 
+            onClick={() => window.location.href = '/notifications'} 
+            variant="ghost" 
+            size="icon" 
+            className="p-2 rounded-full bg-neutral-100 text-neutral-600 hover:bg-neutral-200 relative"
+          >
             <NotificationIcon />
             <span className="absolute top-0 right-0 w-2 h-2 bg-secondary-500 rounded-full"></span>
           </Button>
-          <Button variant="ghost" size="icon" className="p-2 rounded-full bg-neutral-100 text-neutral-600 hover:bg-neutral-200">
+          <Button 
+            onClick={() => window.location.href = '/settings'} 
+            variant="ghost" 
+            size="icon" 
+            className="p-2 rounded-full bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
+          >
             <SettingsIcon />
           </Button>
         </div>
