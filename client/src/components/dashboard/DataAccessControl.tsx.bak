@@ -450,19 +450,12 @@ export default function DataAccessControl() {
               <path d="M22 10H18C15 10 14 9 14 6V2L22 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <div>
-            <CardTitle className="text-slate-800 dark:text-white text-lg font-semibold">Data Access Control</CardTitle>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage provider permissions</p>
-          </div>
+          <CardTitle className="text-lg font-display tracking-tight text-slate-800 dark:text-white">Data Access Control</CardTitle>
         </div>
-        <div>
-          <Badge variant="outline" className="border-secondary-200 bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-secondary-900/30 dark:to-secondary-800/30 text-secondary-600 dark:text-secondary-400 shadow-sm">
-            <div className="flex items-center">
-              <ShieldCheckIcon className="h-3 w-3 mr-1 text-secondary-500" />
-              <span className="text-xs font-medium">Blockchain Protected</span>
-            </div>
-          </Badge>
-        </div>
+        <Badge variant="outline" className="bg-secondary-50 dark:bg-secondary-900/30 text-secondary-700 dark:text-secondary-300 px-3 py-1 rounded-full flex items-center gap-1.5 font-medium border-secondary-200 dark:border-secondary-800">
+          <ShieldCheckIcon className="text-secondary-500 dark:text-secondary-400 h-4 w-4" />
+          <span>Blockchain Protected</span>
+        </Badge>
       </CardHeader>
       
       <CardContent className="p-5 relative z-10">
