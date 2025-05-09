@@ -43,7 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Setup session and authentication
   const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET || "medibridge-secret",
+    secret: process.env.SESSION_SECRET || "medibird-secret",
     resave: false,
     saveUninitialized: false,
     cookie: { 

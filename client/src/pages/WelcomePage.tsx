@@ -520,7 +520,7 @@ const WelcomePage = () => {
               className="text-center mb-12"
             >
               <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-                Welcome to MediBridge
+                Welcome to MediBird
               </h1>
               <p className="text-xl text-blue-100 max-w-2xl mx-auto">
                 The decentralized healthcare platform securing your data with blockchain technology

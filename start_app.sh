@@ -4,7 +4,7 @@
 pkill -f "node|tsx" || true
 sleep 2
 
-echo "Starting MediBridge application..."
+echo "Starting MediBird application..."
 export NODE_ENV=development
 
 # Run the application

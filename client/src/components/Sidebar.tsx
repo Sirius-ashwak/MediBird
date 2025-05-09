@@ -54,7 +54,7 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
         <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0">
           <PulseIcon className="text-white text-xl" />
         </div>
-        <h1 className={`font-display font-bold text-xl text-primary-600 ${logoTextVisible} transition-opacity duration-200 ${contentClass} ${transitionDelay}`}>MediBridge</h1>
+        <h1 className={`font-display font-bold text-xl text-primary-600 ${logoTextVisible} transition-opacity duration-200 ${contentClass} ${transitionDelay}`}>MediBird</h1>
         
         {/* Toggle button */}
         <Button

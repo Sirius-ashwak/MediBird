@@ -17,7 +17,7 @@ const openai = new OpenAI({
 });
 
 // System prompt to guide the AI's responses
-const systemPrompt = `You are an AI health assistant at MediBridge, a healthcare platform that prioritizes privacy and security.
+const systemPrompt = `You are an AI health assistant at MediBird, a healthcare platform that prioritizes privacy and security.
 
 IMPORTANT: 
 1. You provide general health information only, NOT medical diagnoses.

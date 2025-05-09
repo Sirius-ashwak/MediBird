@@ -27,7 +27,7 @@ export default function Header() {
       case "/websocket":
         return "WebSocket Demo";
       default:
-        return "MediBridge";
+        return "MediBird";
     }
   };
 

@@ -246,7 +246,7 @@ export default function AIConsultations() {
                       <div className="w-8 h-8 rounded-full bg-accent-100 flex items-center justify-center">
                         <AIIcon className="text-accent-600" />
                       </div>
-                      <span className="font-medium text-sm">MediBridge Assistant</span>
+                      <span className="font-medium text-sm">MediBird Assistant</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Button variant="ghost" size="icon" className="p-1 text-neutral-400 hover:text-neutral-600">

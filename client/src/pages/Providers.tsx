@@ -130,7 +130,7 @@ export default function Providers() {
             <CardContent>
               <div className="space-y-4">
                 <p className="text-neutral-600">
-                  MediBridge's provider network consists of verified healthcare professionals and organizations. All providers in our network have been verified and are able to securely access your health information when you grant consent.
+                  MediBird's provider network consists of verified healthcare professionals and organizations. All providers in our network have been verified and are able to securely access your health information when you grant consent.
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -174,7 +174,7 @@ export default function Providers() {
                     Provider Authentication
                   </h3>
                   <p className="text-sm text-neutral-600">
-                    All healthcare providers on MediBridge are authenticated using blockchain technology, ensuring their identities are verified and tamper-proof.
+                    All healthcare providers on MediBird are authenticated using blockchain technology, ensuring their identities are verified and tamper-proof.
                   </p>
                 </div>
                 

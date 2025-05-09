@@ -347,7 +347,7 @@ export default function ConsentManagement() {
                     Zero-Knowledge Proofs
                   </h3>
                   <p className="text-sm text-neutral-600">
-                    MediBridge uses Zero-Knowledge Proofs to verify your identity and health data without revealing the actual information. This cryptographic method ensures privacy while still allowing verification.
+                    MediBird uses Zero-Knowledge Proofs to verify your identity and health data without revealing the actual information. This cryptographic method ensures privacy while still allowing verification.
                   </p>
                 </div>
                 

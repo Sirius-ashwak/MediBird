@@ -91,7 +91,7 @@ export default function LoginPage() {
         <div className="w-full p-8 md:w-1/2">
           <div className="flex flex-col justify-center h-full">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-blue-900">MediBridge</h1>
+              <h1 className="text-3xl font-bold text-blue-900">MediBird</h1>
               <p className="text-gray-600 mt-2">Decentralized Healthcare Platform</p>
             </div>
 
@@ -156,7 +156,7 @@ export default function LoginPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Register</CardTitle>
-                    <CardDescription>Create a new account to access MediBridge</CardDescription>
+                    <CardDescription>Create a new account to access MediBird</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleRegister}>
@@ -230,7 +230,7 @@ export default function LoginPage() {
         {/* Right Column - Hero Section */}
         <div className="hidden md:block md:w-1/2 bg-blue-600 rounded-r-lg p-8">
           <div className="flex flex-col justify-center h-full text-white">
-            <h2 className="text-3xl font-bold mb-6">Welcome to MediBridge</h2>
+            <h2 className="text-3xl font-bold mb-6">Welcome to MediBird</h2>
             <p className="mb-4">A decentralized AI-powered healthcare access system that puts you in control of your medical data.</p>
             <ul className="space-y-2">
               <li className="flex items-center">

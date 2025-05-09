@@ -23,7 +23,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     // Check for saved preference in localStorage if available
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('medibridge-sidebar-collapsed');
+      const saved = localStorage.getItem('medibird-sidebar-collapsed');
       return saved === 'true';
     }
     return false;
@@ -38,7 +38,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     setSidebarCollapsed(newState);
     // Save preference to localStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('medibridge-sidebar-collapsed', String(newState));
+      localStorage.setItem('medibird-sidebar-collapsed', String(newState));
     }
   };
   
@@ -54,7 +54,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-white">
         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
-        <span className="ml-2 text-primary-600">Loading MediBridge...</span>
+        <span className="ml-2 text-primary-600">Loading MediBird...</span>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <PulseIcon className="text-white text-lg" />
             </div>
-            <h1 className="font-display font-bold text-lg text-primary-600">MediBridge</h1>
+            <h1 className="font-display font-bold text-lg text-primary-600">MediBird</h1>
           </div>
           <button 
             onClick={() => setMobileMenuOpen(true)}

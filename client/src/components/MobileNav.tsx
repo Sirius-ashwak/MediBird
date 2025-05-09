@@ -88,7 +88,7 @@ export default function MobileNav({ onClose, isMobileBar = false }: MobileNavPro
         <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
           <PulseIcon className="text-white text-lg" />
         </div>
-        <h1 className="font-display font-bold text-lg text-primary-600">MediBridge</h1>
+        <h1 className="font-display font-bold text-lg text-primary-600">MediBird</h1>
       </div>
       
       {/* Mobile navigation */}

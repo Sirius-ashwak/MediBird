@@ -197,7 +197,7 @@ export default function AIConsultation() {
                 >
                   <AIIcon className="text-white h-4 w-4" />
                 </motion.div>
-                <span className="font-medium text-sm text-slate-800 dark:text-slate-200">MediBridge Assistant</span>
+                <span className="font-medium text-sm text-slate-800 dark:text-slate-200">MediBird Assistant</span>
               </div>
               <div className="flex items-center space-x-1">
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>

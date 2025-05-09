@@ -1,5 +1,5 @@
 /**
- * Cryptographic utilities for the MediBridge platform
+ * Cryptographic utilities for the MediBird platform
  * Provides functions for signing, verifying, and encrypting/decrypting data
  * using Polkadot's cryptographic primitives
  */

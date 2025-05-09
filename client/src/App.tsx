@@ -71,7 +71,7 @@ function Router() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
-        <span className="ml-2 text-primary-600">Loading MediBridge...</span>
+        <span className="ml-2 text-primary-600">Loading MediBird...</span>
       </div>
     );
   }

@@ -1,0 +1,108 @@
+ 1.5 ETSI M2Mhigh-level architecture
+  This high-level architecture is a combination of both a functional and topological view
+ showing some functional groups (FG) clearly associated with pieces of physical
+ infrastructure (e.g. M2M Devices, Gateways).
+  There are two main domains, a network domain and a device and gateway domain.
+  The boundary between these conceptually separated domains is
+ border between the physical devices and gateways and the physical
+ infrastructure (Access network).
+ the topological
+ communication
+ Fig-1.5 -ETSI M2M High Level Architecture
+ The Device and Gateway Domain contains the following functional/topological
+ entities:
+  M2MDevice:
+  This is the device of interest for an M2M scenario, for example, a device
+ with a temperature sensor.
+  AnM2MDevice contains M2M Applications and M2M Service Capabilities.
+  AnM2Mdevice connects to the Network Domain either directly or through
+ an M2M Gateway:
+lOMoARcPSD|28549455
+ •Direct connection: The M2M Device is capable of performing
+ registration, authentication, authorization, management, and provisioning to
+ the Network Domain. Direct connection also means that the M2M device
+ contains the appropriate physical layer to be able to communicate with the
+ Access Network.
+ •Through one or more M2M Gateway: M2M device does not have the
+ appropriate
+ physical
+ layer,
+ compatible
+ with
+ the
+ Access
+ Network
+ technology, and therefore it needs a network domain proxy. Moreover, a
+ number of M2M devices may form their own local M2M Area Network that
+ typically employs a different networking technology from the Access Network. The
+ M2M Gateway acts as a proxy for the Network Domain and performs the procedures
+ of authentication, authorization, management, and provisioning. An M2M Device could
+ connect through multiple M2M Gateways.
+  M2MAreaNetwork:
+  This is a local area network (LAN) or a Personal Area Network (PAN) and
+ provides connectivity between M2M Devices and M2M Gateways.
+  Typical networking technologies are IEEE 802.15.1 (Bluetooth), IEEE
+ 802.15.4 (ZigBee, IETF 6LoWPAN/ROLL/CoRE), MBUS, KNX (wired or
+ wireless) PLC,etc.
+  M2MGateway:
+  The device that provides connectivity for M2M Devices in an M2M Area
+ Network towards the Network Domain.
+  TheM2MGateway contains M2M Applications and M2M Service Capabilities.
+  The M2M Gateway may also provide services to other legacy devices thatare
+ not visible to the Network Domain.
+ The Network Domain contains the following functional/topological entities:
+  Access Network:
+  This is the network that allows the devices in the Device and Gateway
+ Domain to communicate with the Core Network.
+  Example Access Network Technologies are fixed (xDSL, HFC) and
+ wireless(Satellite, GERAN, UTRAN, E-UTRAN W-LAN, WiMAX).
+  CoreNetwork:
+  Examples of Core Networks are 3GPP Core Network and ETSI TISPAN
+ CoreNetwork. It provides the following functions:
+ • IP connectivity.
+ • Service and Network control.
+ • Interconnection with other networks.
+ • Roaming.
+lOMoARcPSD|28549455
+  M2MService Capabilities:
+  These are functions exposed to different M2M Applications through a set
+ of openinterfaces.
+  These functions use underlying Core Network functions, and their
+ objective is to abstract the network functions for the sake of simpler
+ applications.
+  M2MApplications:
+  These are the specific M2M applications (e.g. smart metering) that
+ utilize theM2M Service Capabilities through the open interfaces.
+  NetworkManagement Functions:
+  These are all the necessary functions to manage the Access and Core
+ Network (e.g. Provisioning, Fault Management, etc.).
+  M2MManagement Functions:
+  These are the necessary functions required to manage the M2M Service
+ Capabilities on the Network Domain.
+  There are two M2M Management functions:
+ • M2MService Bootstrap Function (MSBF): The MSBF facilitatesthe
+ bootstrapping of permanent M2M service layer security credentials in the
+ M2MDevice or Gateway and the M2M Service Capabilities in the Network
+ Domain.
+ • M2MAuthentication Server (MAS): This is the safe execution
+ environment where permanent security credentials such as the M2M Root Key
+ are stored.
+  Themost relevant entities in the ETSI M2M architecture are the M2M Nodes and M2M
+ Applications.
+  AnM2MNode can be a Device M2M,Gateway M2M,or Network M2M Node.
+  An M2MApplication is the main application logic that uses the Service Capabilities to
+ achieve the M2M system requirements.
+lOMoARcPSD|28549455
+ Fig 1.6-M2M Service Capabilities, M2M Nodes & Open Interfaces
+  The application logic can be deployed on a Device (Device Application,
+ Gateway(Gateway Application, GA) or Network (Network Application, NA).
+ DA),
+  The SCL (Service Capability Layer) is a collection of functions that are exposed
+ through the open interfaces or reference points mIa, dIa, and mId (ETSI M2M TC
+ 2013b).
+  Because the main topological entities that SCL can deploy are the Device,
+ Gateway, and Network Domain, there are three types of SCL: DSCL (Device
+ Service Capabilities Layer), GSCL (Gateway Service Capabilities Layer), and NSCL
+ (Network ServiceCapabilities Layer).
+  SCL functions utilize underlying networking capabilities through technology-specific
+ interfaces.

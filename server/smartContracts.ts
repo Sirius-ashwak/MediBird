@@ -1,5 +1,5 @@
 /**
- * This module provides smart contract implementations for the MediBridge platform.
+ * This module provides smart contract implementations for the MediBird platform.
  * It uses Polkadot's substrate framework to create and interact with smart contracts
  * that manage medical records, consent, and data access.
  */

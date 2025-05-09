@@ -1,7 +1,7 @@
 import type { Variants } from 'framer-motion';
 
 /**
- * Animation utility library for MediBridge
+ * Animation utility library for MediBird
  * Contains reusable animations for consistent micro-interactions
  */
 

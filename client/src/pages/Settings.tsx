@@ -502,7 +502,7 @@ export default function Settings() {
                 Privacy Settings
               </CardTitle>
               <CardDescription className="text-neutral-600">
-                Control how your data is shared and used across the MediBridge platform.
+                Control how your data is shared and used across the MediBird platform.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">

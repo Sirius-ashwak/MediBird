@@ -1,6 +1,6 @@
 [
   {
-    "name": "MediBridge App",
+    "name": "Start application",
     "language": "nodejs",
     "preview": {
       "terminateCommand": "pkill -f 'node|tsx'"

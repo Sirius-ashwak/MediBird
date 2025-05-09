@@ -63,7 +63,7 @@ export default function WebSocketDemo() {
       // In Replit environment, we need to ensure we're connecting to the correct host
       // The server runs on port 5000, but the frontend might be on a different port
       const host = window.location.hostname;
-      const port = '5000'; // MediBridge server port
+      const port = '5000'; // MediBird server port
       const wsUrl = `${protocol}//${host}:${port}/ws`;
       
       addMessage(`Connecting to ${wsUrl}...`, 'system');
@@ -200,7 +200,7 @@ export default function WebSocketDemo() {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">WebSocket Demo</h1>
       <p className="mb-6 text-gray-600">
-        This page demonstrates real-time communication using WebSockets for MediBridge.
+        This page demonstrates real-time communication using WebSockets for MediBird.
       </p>
       
       <Card className="mb-6">
@@ -210,7 +210,7 @@ export default function WebSocketDemo() {
             <ConnectionStatusBadge status={connectionStatus} />
           </div>
           <CardDescription>
-            Connect to the MediBridge WebSocket server to send and receive real-time messages.
+            Connect to the MediBird WebSocket server to send and receive real-time messages.
           </CardDescription>
         </CardHeader>
         
@@ -281,7 +281,7 @@ export default function WebSocketDemo() {
         </CardHeader>
         <CardContent>
           <p className="mb-4">
-            This WebSocket implementation demonstrates several key features of MediBridge:
+            This WebSocket implementation demonstrates several key features of MediBird:
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>Real-time bidirectional communication between clients and server</li>

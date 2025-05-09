@@ -837,7 +837,7 @@ class BlockchainService {
       const credential = {
         id: `vc-${userId}-${credentialType}-${this.generateRandomHex(8)}`,
         type: credentialType,
-        issuer: 'MediBridge',
+        issuer: 'MediBird',
         subject: userId,
         issuanceDate: new Date().toISOString(),
         expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
