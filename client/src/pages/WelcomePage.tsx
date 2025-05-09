@@ -2,17 +2,48 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Shield, Lock, Database, FileCheck, RefreshCw } from 'lucide-react';
+import { ArrowRight, Shield, Lock, Database, FileCheck, RefreshCw, 
+         Globe, Activity, Key, CheckCircle2, Layers, HardDrive } from 'lucide-react';
 
-// Define interface for blockchain nodes
-interface BlockchainNode {
+// Define interfaces for our visual elements
+interface HexagonParticle {
   x: number;
   y: number;
-  vx: number;
-  vy: number;
+  size: number;
+  opacity: number;
+  speed: number;
+  hue: number;
+  rotation: number;
+  rotationSpeed: number;
+}
+
+interface BlockElement {
+  x: number;
+  y: number;
+  z: number; // For 3D perspective
+  width: number;
+  height: number;
+  depth: number;
+  speed: number;
+  color: string;
+  shadowColor: string;
+  opacity: number;
+  scale: number;
+  targetScale: number;
+  linkedBlocks: number[];
+  dataHash: string;
+  glowing: boolean;
+  glowIntensity: number;
+}
+
+interface DataPulse {
+  startBlockIndex: number;
+  endBlockIndex: number;
+  progress: number;
+  speed: number;
   size: number;
   color: string;
-  connections: number[];
+  completed: boolean;
 }
 
 const WelcomePage = () => {
@@ -48,7 +79,7 @@ const WelcomePage = () => {
     };
   }, []);
 
-  // Blockchain visualization animation
+  // Modern blockchain visualization
   useEffect(() => {
     if (!canvasRef.current || animationStep < 2) return;
 
@@ -56,123 +87,417 @@ const WelcomePage = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = canvas.width = canvas.offsetWidth;
-    const height = canvas.height = canvas.offsetHeight;
-
-    // Nodes for the blockchain visualization
-    const nodes: BlockchainNode[] = [];
-    const numNodes = 12;
-    const blockSize = width / 20;
+    // Set canvas dimensions and handle resizing
+    const setCanvasDimensions = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
     
-    // Initialize nodes
-    for (let i = 0; i < numNodes; i++) {
-      nodes.push({
-        x: Math.random() * (width - blockSize * 2) + blockSize,
-        y: Math.random() * (height - blockSize * 2) + blockSize,
-        vx: (Math.random() - 0.5) * 1,
-        vy: (Math.random() - 0.5) * 1,
-        size: blockSize + Math.random() * 10,
-        color: `hsl(${210 + Math.random() * 40}, 80%, 50%)`,
-        connections: []
-      });
-    }
+    setCanvasDimensions();
+    window.addEventListener('resize', setCanvasDimensions);
 
-    // Create connections between nodes
-    for (let i = 0; i < numNodes; i++) {
-      const numConnections = Math.floor(Math.random() * 3) + 1;
-      for (let j = 0; j < numConnections; j++) {
-        let targetNode;
-        do {
-          targetNode = Math.floor(Math.random() * numNodes);
-        } while (targetNode === i || nodes[i].connections.includes(targetNode));
+    // Create a beautiful, 3D-like blockchain visualization
+    const blocks: BlockElement[] = [];
+    const hexParticles: HexagonParticle[] = [];
+    const dataPulses: DataPulse[] = [];
+    
+    const numBlocks = 7; // Fewer, more detailed blocks for quality over quantity
+    const baseBlockWidth = Math.min(canvas.width, canvas.height) * 0.13;
+    const baseBlockHeight = baseBlockWidth * 0.65;
+    const blockDepth = baseBlockWidth * 0.2;
+    
+    // Create background hexagon particles
+    const createHexagonParticles = (count: number) => {
+      for (let i = 0; i < count; i++) {
+        hexParticles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: 2 + Math.random() * 10,
+          opacity: 0.05 + Math.random() * 0.2,
+          speed: 0.05 + Math.random() * 0.3,
+          hue: 210 + Math.random() * 40,
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.01
+        });
+      }
+    };
+
+    createHexagonParticles(50);
+    
+    // Generate hash-like string for blocks
+    const generateBlockHash = () => {
+      const chars = '0123456789abcdef';
+      let hash = '';
+      for (let i = 0; i < 16; i++) {
+        hash += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return hash;
+    };
+    
+    // Initialize blocks in a visually pleasing arrangement
+    // Using a modified chain layout for better visual aesthetics
+    const initializeBlocks = () => {
+      // Calculate the chain's center
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2; 
+      
+      // The vertical offset for odd and even blocks to create a zigzag
+      const verticalOffset = baseBlockHeight * 0.7;
+      
+      for (let i = 0; i < numBlocks; i++) {
+        // Position blocks in a horizontal chain with slight elevation changes
+        const x = centerX + (i - Math.floor(numBlocks/2)) * (baseBlockWidth * 1.5);
+        // Add zigzag effect (even blocks higher, odd blocks lower)
+        const y = centerY + (i % 2 === 0 ? -verticalOffset : verticalOffset);
         
-        nodes[i].connections.push(targetNode);
-        if (!nodes[targetNode].connections.includes(i)) {
-          nodes[targetNode].connections.push(i);
+        const block: BlockElement = {
+          x,
+          y,
+          z: 0,
+          width: baseBlockWidth,
+          height: baseBlockHeight,
+          depth: blockDepth,
+          speed: 0,
+          color: `hsl(${210 + Math.random() * 30}, 70%, ${40 + Math.random() * 20}%)`,
+          shadowColor: `rgba(80, 100, 240, ${0.3 + Math.random() * 0.3})`,
+          opacity: 0.9,
+          scale: 1,
+          targetScale: 1,
+          linkedBlocks: [],
+          dataHash: generateBlockHash(),
+          glowing: false,
+          glowIntensity: 0
+        };
+        
+        // Link blocks in chain
+        if (i > 0) {
+          block.linkedBlocks.push(i - 1);
+          blocks[i - 1].linkedBlocks.push(i);
+        }
+        
+        // Add some non-sequential connections for a more network-like appearance
+        if (i > 2 && Math.random() > 0.7) {
+          const randomPrevious = Math.floor(Math.random() * (i - 1));
+          block.linkedBlocks.push(randomPrevious);
+          blocks[randomPrevious].linkedBlocks.push(i);
+        }
+        
+        blocks.push(block);
+      }
+    };
+    
+    const createDataPulse = () => {
+      if (blocks.length < 2) return;
+      
+      // Find a valid connection to animate
+      const startIdx = Math.floor(Math.random() * blocks.length);
+      if (blocks[startIdx].linkedBlocks.length === 0) return;
+      
+      const linkIdx = Math.floor(Math.random() * blocks[startIdx].linkedBlocks.length);
+      const endIdx = blocks[startIdx].linkedBlocks[linkIdx];
+      
+      // Create the data pulse
+      dataPulses.push({
+        startBlockIndex: startIdx,
+        endBlockIndex: endIdx,
+        progress: 0,
+        speed: 0.01 + Math.random() * 0.02,
+        size: 3 + Math.random() * 4,
+        color: `hsl(${180 + Math.random() * 60}, 90%, 70%)`,
+        completed: false
+      });
+      
+      // Make the source block temporarily glow
+      blocks[startIdx].glowing = true;
+      blocks[startIdx].glowIntensity = 1;
+    };
+    
+    // Draw a 3D-like block
+    const drawBlock = (block: BlockElement) => {
+      ctx.save();
+      
+      // Apply scale
+      ctx.translate(block.x, block.y);
+      ctx.scale(block.scale, block.scale);
+      ctx.translate(-block.x, -block.y);
+      
+      const x = block.x - block.width / 2;
+      const y = block.y - block.height / 2;
+      
+      // Draw any glow effect
+      if (block.glowing && block.glowIntensity > 0) {
+        const glow = ctx.createRadialGradient(
+          block.x, block.y, 1,
+          block.x, block.y, block.width * 1.2
+        );
+        glow.addColorStop(0, `rgba(100, 200, 255, ${0.5 * block.glowIntensity})`);
+        glow.addColorStop(1, 'rgba(100, 200, 255, 0)');
+        
+        ctx.fillStyle = glow;
+        ctx.fillRect(
+          block.x - block.width * 1.5, 
+          block.y - block.height * 1.5, 
+          block.width * 3, 
+          block.height * 3
+        );
+      }
+      
+      // Draw main block face
+      ctx.fillStyle = block.color;
+      ctx.beginPath();
+      ctx.rect(x, y, block.width, block.height);
+      ctx.fill();
+      
+      // 3D effect - top face with lighter color
+      ctx.fillStyle = adjustBrightness(block.color, 30);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + block.depth, y - block.depth);
+      ctx.lineTo(x + block.width + block.depth, y - block.depth);
+      ctx.lineTo(x + block.width, y);
+      ctx.closePath();
+      ctx.fill();
+      
+      // 3D effect - right face with darker color
+      ctx.fillStyle = adjustBrightness(block.color, -20);
+      ctx.beginPath();
+      ctx.moveTo(x + block.width, y);
+      ctx.lineTo(x + block.width + block.depth, y - block.depth);
+      ctx.lineTo(x + block.width + block.depth, y + block.height - block.depth);
+      ctx.lineTo(x + block.width, y + block.height);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Draw subtle grid pattern on main face
+      ctx.strokeStyle = adjustBrightness(block.color, 10);
+      ctx.lineWidth = 0.5;
+      const gridSize = 8;
+      
+      for (let i = 0; i <= block.width; i += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x + i, y);
+        ctx.lineTo(x + i, y + block.height);
+        ctx.stroke();
+      }
+      
+      for (let i = 0; i <= block.height; i += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + i);
+        ctx.lineTo(x + block.width, y + i);
+        ctx.stroke();
+      }
+      
+      // Add hash text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = '7px monospace';
+      ctx.fillText(block.dataHash, x + 5, y + block.height - 6);
+      
+      // Add a blockchain icon
+      const iconSize = block.height * 0.3;
+      const iconX = x + block.width/2 - iconSize/2;
+      const iconY = y + block.height/2 - iconSize/2;
+      
+      // Draw a stylized lock icon
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.beginPath();
+      ctx.rect(iconX, iconY, iconSize, iconSize);
+      ctx.fill();
+      
+      ctx.restore();
+    };
+    
+    // Draw hexagon particle background
+    const drawHexagonParticle = (particle: HexagonParticle) => {
+      ctx.save();
+      ctx.translate(particle.x, particle.y);
+      ctx.rotate(particle.rotation);
+      
+      ctx.beginPath();
+      const a = Math.PI * 2 / 6;
+      for (let i = 0; i < 6; i++) {
+        ctx.lineTo(
+          particle.size * Math.cos(a * i), 
+          particle.size * Math.sin(a * i)
+        );
+      }
+      ctx.closePath();
+      
+      ctx.fillStyle = `hsla(${particle.hue}, 80%, 50%, ${particle.opacity})`;
+      ctx.fill();
+      
+      ctx.restore();
+    };
+    
+    // Draw data pulse (packet traveling between blocks)
+    const drawDataPulse = (pulse: DataPulse) => {
+      const startBlock = blocks[pulse.startBlockIndex];
+      const endBlock = blocks[pulse.endBlockIndex];
+      
+      // Calculate current position based on progress
+      const x = startBlock.x + (endBlock.x - startBlock.x) * pulse.progress;
+      const y = startBlock.y + (endBlock.y - startBlock.y) * pulse.progress;
+      
+      // Draw glow
+      const glow = ctx.createRadialGradient(
+        x, y, 1,
+        x, y, pulse.size * 3
+      );
+      glow.addColorStop(0, pulse.color);
+      glow.addColorStop(1, 'rgba(100, 200, 255, 0)');
+      
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, pulse.size * 3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Draw core
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.beginPath();
+      ctx.arc(x, y, pulse.size, 0, Math.PI * 2);
+      ctx.fill();
+    };
+    
+    // Draw connections between blocks
+    const drawConnections = () => {
+      for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i];
+        
+        for (const linkedIdx of block.linkedBlocks) {
+          const linkedBlock = blocks[linkedIdx];
+          
+          // Create gradient for connection line
+          const gradient = ctx.createLinearGradient(
+            block.x, block.y, 
+            linkedBlock.x, linkedBlock.y
+          );
+          gradient.addColorStop(0, `rgba(120, 180, 255, 0.4)`);
+          gradient.addColorStop(1, `rgba(100, 140, 240, 0.2)`);
+          
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = 1.5;
+          
+          // Draw connection with a subtle curve
+          ctx.beginPath();
+          ctx.moveTo(block.x, block.y);
+          
+          // Add subtle curve for visual interest
+          const midX = (block.x + linkedBlock.x) / 2;
+          const midY = (block.y + linkedBlock.y) / 2;
+          const offset = 15 * (Math.random() > 0.5 ? 1 : -1);
+          
+          ctx.quadraticCurveTo(
+            midX + offset, 
+            midY + offset, 
+            linkedBlock.x, 
+            linkedBlock.y
+          );
+          
+          ctx.stroke();
         }
       }
-    }
-
+    };
+    
+    // Utility to adjust color brightness
+    const adjustBrightness = (color: string, percent: number): string => {
+      const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+      if (!match) return color;
+      
+      const h = parseInt(match[1], 10);
+      const s = parseInt(match[2], 10);
+      let l = parseInt(match[3], 10);
+      
+      l = Math.min(100, Math.max(0, l + percent));
+      
+      return `hsl(${h}, ${s}%, ${l}%)`;
+    };
+    
+    // Initialize the blocks
+    initializeBlocks();
+    
     // Animation function
     const animate = () => {
       if (!ctx) return;
       
-      ctx.clearRect(0, 0, width, height);
-
-      // Update and draw nodes
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Update and draw hexagon particles
+      for (const particle of hexParticles) {
+        particle.y += particle.speed;
+        particle.rotation += particle.rotationSpeed;
         
-        // Move nodes
-        node.x += node.vx;
-        node.y += node.vy;
-        
-        // Bounce off walls
-        if (node.x < node.size / 2 || node.x > width - node.size / 2) {
-          node.vx *= -1;
-        }
-        if (node.y < node.size / 2 || node.y > height - node.size / 2) {
-          node.vy *= -1;
+        // Reset particles that move off-screen
+        if (particle.y > canvas.height + particle.size) {
+          particle.y = -particle.size;
+          particle.x = Math.random() * canvas.width;
         }
         
-        // Draw connections first (so they're behind nodes)
-        for (const connectionIndex of node.connections) {
-          const connectedNode = nodes[connectionIndex];
-          ctx.beginPath();
-          ctx.moveTo(node.x, node.y);
-          ctx.lineTo(connectedNode.x, connectedNode.y);
-          ctx.strokeStyle = 'rgba(120, 180, 255, 0.3)';
-          ctx.lineWidth = 2;
-          ctx.stroke();
+        drawHexagonParticle(particle);
+      }
+      
+      // Draw connections between blocks
+      drawConnections();
+      
+      // Update and draw blocks
+      for (const block of blocks) {
+        // Update block animations
+        if (block.scale !== block.targetScale) {
+          block.scale += (block.targetScale - block.scale) * 0.1;
+        }
+        
+        // Update glow effect
+        if (block.glowing) {
+          block.glowIntensity -= 0.02;
+          if (block.glowIntensity <= 0) {
+            block.glowing = false;
+            block.glowIntensity = 0;
+          }
+        }
+        
+        // Draw the block
+        drawBlock(block);
+      }
+      
+      // Update and draw data pulses
+      for (let i = dataPulses.length - 1; i >= 0; i--) {
+        const pulse = dataPulses[i];
+        
+        // Update pulse position
+        pulse.progress += pulse.speed;
+        
+        // Check if pulse reached destination
+        if (pulse.progress >= 1) {
+          // Trigger glow on destination block
+          blocks[pulse.endBlockIndex].glowing = true;
+          blocks[pulse.endBlockIndex].glowIntensity = 1;
+          
+          // Remove completed pulse
+          dataPulses.splice(i, 1);
+        } else {
+          // Draw active pulse
+          drawDataPulse(pulse);
         }
       }
       
-      // Draw nodes on top of connections
-      for (const node of nodes) {
-        ctx.beginPath();
-        ctx.rect(node.x - node.size / 2, node.y - node.size / 2, node.size, node.size);
-        ctx.fillStyle = node.color;
-        ctx.fill();
-        
-        // Draw a lock icon in the center of each block
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.beginPath();
-        const lockSize = node.size / 3;
-        ctx.rect(node.x - lockSize / 2, node.y - lockSize / 2, lockSize, lockSize);
-        ctx.fill();
+      // Randomly generate new data pulses
+      if (Math.random() < 0.02 && dataPulses.length < 5) {
+        createDataPulse();
       }
-
-      // Data packet animation
-      if (Math.random() < 0.05) {
-        const startNode = Math.floor(Math.random() * nodes.length);
-        const endNode = nodes[startNode].connections[
-          Math.floor(Math.random() * nodes[startNode].connections.length)
-        ];
-        
-        if (endNode !== undefined) {
-          const startX = nodes[startNode].x;
-          const startY = nodes[startNode].y;
-          const endX = nodes[endNode].x;
-          const endY = nodes[endNode].y;
-          
-          ctx.beginPath();
-          ctx.arc(startX + (endX - startX) * Math.random(), 
-                 startY + (endY - startY) * Math.random(), 4, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fill();
-        }
-      }
-
+      
+      // Continue animation
       const animationId = requestAnimationFrame(animate);
       animationRef.current = animationId;
     };
-
+    
+    // Start animation
     animate();
-
+    
+    // Cleanup
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+      window.removeEventListener('resize', setCanvasDimensions);
     };
   }, [animationStep]);
 
