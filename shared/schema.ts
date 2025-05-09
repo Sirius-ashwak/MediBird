@@ -259,6 +259,8 @@ export interface DataAccessProvider extends Provider {
   daysLeft?: number;
   accessTo: string[];
   active: boolean;
+  blockchainHash?: string; // Hash of the blockchain transaction that created this consent
+  blockchainTimestamp?: Date; // Timestamp of when this consent was recorded on the blockchain
 }
 
 export interface Message {

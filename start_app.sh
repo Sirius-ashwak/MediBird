@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Start MediBridge application
+# Kill any existing Node.js processes
+pkill -f "node|tsx" || true
+sleep 2
+
+echo "Starting MediBridge application..."
 export NODE_ENV=development
 
-# Run the application with TSX
-npx tsx server/index.ts
+# Run the application
+exec npx tsx server/index.ts

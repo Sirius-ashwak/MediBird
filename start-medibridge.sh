@@ -1,18 +1,25 @@
 #!/bin/bash
 
-# This script serves as an entry point for the MediBridge application
-# Set development environment
-export NODE_ENV=development
+# Kill any existing Node.js processes
+pkill -f "node|tsx" || true
+sleep 2
 
-# Check if environment variables file exists
-if [ ! -f .env ]; then
-  echo "Notice: .env file not found. Creating from example with default values."
-  cp .env.example .env
-  echo "Please update .env file with your actual API keys for full functionality."
-fi
+# Start the application in the background
+NODE_ENV=development PORT=5000 HOST=0.0.0.0 tsx server/index.ts > medibridge.log 2>&1 &
 
-# Kill any existing processes
-pkill -f "tsx server/index.ts" || true
+# Store the process ID
+echo $! > medibridge.pid
 
-# Start the application
-npm run dev
+# Wait a moment for the app to start
+sleep 5
+
+# Output the log to see the startup progress
+echo "MediBridge application started. Here are the startup logs:"
+cat medibridge.log
+
+# Output a success message
+echo ""
+echo "MediBridge is now running on port 5000"
+echo "PID: $(cat medibridge.pid)"
+echo ""
+echo "To view more logs, run: tail -f medibridge.log"

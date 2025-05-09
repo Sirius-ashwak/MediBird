@@ -904,12 +904,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Default access duration: 30 days
       const accessDuration = duration || 30;
       
-      const consentId = await blockchain.grantSelectiveAccess(
+      // Calculate expiry date
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + accessDuration);
+      
+      // Store consent on blockchain
+      const blockchainHash = await blockchain.grantSelectiveAccess(
         req.user.id,
         providerId,
         dataTypes,
         accessDuration
       );
+      
+      // Create a matching database record for local storage
+      const databaseConsent = await storage.createConsent({
+        userId: req.user.id,
+        providerId: parseInt(providerId.toString()),
+        status: "approved", // Auto-approve blockchain consents
+        dataType: dataTypes.join(','), // Format for database storage
+        expiryDate: expiryDate,
+        active: true, // Make it active by default
+        blockchainHash: blockchainHash,
+        blockchainTimestamp: new Date()
+      });
       
       // Log activity
       await storage.createActivity({
@@ -917,26 +934,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: "selective_access_granted",
         title: "Provider Access Granted",
         description: `Granted access to ${dataTypes.join(', ')} for ${accessDuration} days`,
-        metadata: { providerId, dataTypes, duration: accessDuration }
+        metadata: { 
+          providerId, 
+          dataTypes, 
+          duration: accessDuration,
+          databaseConsentId: databaseConsent.id,
+          blockchainHash
+        }
       });
       
       // Log in blockchain logs
       await storage.createBlockchainLog({
         userId: req.user.id,
         operation: "GRANT_ACCESS",
-        transactionHash: consentId,
+        transactionHash: blockchainHash,
         details: `Granted selective access to provider ${providerId}`,
         status: "completed"
       });
       
       res.json({
-        consentId,
+        consentId: databaseConsent.id,
+        blockchainHash,
         providerId,
         dataTypes,
         duration: accessDuration,
-        expiryDate: new Date(Date.now() + accessDuration * 24 * 60 * 60 * 1000).toISOString(),
+        expiryDate: expiryDate.toISOString(),
         created: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        active: true
       });
     } catch (err) {
       console.error("Error granting selective access:", err);
@@ -1080,7 +1105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Start the server
-  const port = process.env.PORT || 5000;
+  const port = parseInt(process.env.PORT || '5000');
   httpServer.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });

@@ -16,17 +16,63 @@ import { ShieldCheckIcon } from "@/lib/icons";
 import { DataAccessProvider } from "@shared/schema";
 import { RiHospitalLine, RiUser6Line, RiTestTubeLine, RiAddLine, RiShieldKeyholeLine, RiTimeLine } from 'react-icons/ri';
 
+// Helper functions for determining provider icons based on type
+function getProviderIcon(type: string): string {
+  switch (type.toLowerCase()) {
+    case 'doctor':
+    case 'physician':
+      return 'ri-user-6-line';
+    case 'lab':
+    case 'laboratory':
+      return 'ri-test-tube-line';
+    case 'hospital':
+    case 'clinic':
+    default:
+      return 'ri-hospital-line';
+  }
+}
+
+function getProviderIconBg(type: string): string {
+  switch (type.toLowerCase()) {
+    case 'doctor':
+    case 'physician':
+      return 'bg-indigo-100';
+    case 'lab':
+    case 'laboratory':
+      return 'bg-orange-100';
+    case 'hospital':
+    case 'clinic':
+    default:
+      return 'bg-blue-100';
+  }
+}
+
+function getProviderIconColor(type: string): string {
+  switch (type.toLowerCase()) {
+    case 'doctor':
+    case 'physician':
+      return 'text-indigo-600';
+    case 'lab':
+    case 'laboratory':
+      return 'text-orange-600';
+    case 'hospital':
+    case 'clinic':
+    default:
+      return 'text-blue-600';
+  }
+}
+
 export default function DataAccessControl() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<number | null>(null);
   const [selectedDataTypes, setSelectedDataTypes] = useState<string[]>([]);
   const [accessDuration, setAccessDuration] = useState("30");
   
-  const { data: providers, isLoading } = useQuery({
+  const { data: providers = [], isLoading } = useQuery<DataAccessProvider[]>({
     queryKey: ["/api/consent/providers"],
   });
   
-  const { data: allProviders, isLoading: isProvidersLoading } = useQuery({
+  const { data: allProviders = [], isLoading: isProvidersLoading } = useQuery<any[]>({
     queryKey: ["/api/providers"],
   });
 
@@ -120,45 +166,41 @@ export default function DataAccessControl() {
             <div className="flex justify-center p-8">
               <Spinner size="lg" />
             </div>
-          ) : (
+          ) : providers.length > 0 ? (
             <>
-              <ProviderAccessCard 
-                icon="ri-hospital-line"
-                iconBg="bg-blue-100"
-                iconColor="text-blue-600"
-                name="Northwest Medical Center"
-                status="Active permission"
-                daysLeft={30}
-                active={true}
-                accessTo={["Medical history", "Lab results", "Prescriptions"]}
-                onToggle={(active) => toggleAccess.mutate({ id: "nw-medical", active })}
-                isBlockchainVerified={true}
-              />
-              
-              <ProviderAccessCard 
-                icon="ri-user-6-line"
-                iconBg="bg-indigo-100"
-                iconColor="text-indigo-600"
-                name="Dr. Emily Chen"
-                status="Active permission"
-                daysLeft={15}
-                active={true}
-                accessTo={["Medical history", "Prescriptions"]}
-                onToggle={(active) => toggleAccess.mutate({ id: "dr-chen", active })}
-                isBlockchainVerified={true}
-              />
-              
-              <ProviderAccessCard 
-                icon="ri-test-tube-line"
-                iconBg="bg-orange-100"
-                iconColor="text-orange-600"
-                name="CityLabs Diagnostics"
-                status="Pending request"
-                isPending={true}
-                accessTo={["Lab results"]}
-                onReview={() => {}}
-              />
+              {providers.map((provider: DataAccessProvider) => (
+                <ProviderAccessCard 
+                  key={provider.id}
+                  icon={getProviderIcon(provider.type || 'hospital')}
+                  iconBg={getProviderIconBg(provider.type || 'hospital')}
+                  iconColor={getProviderIconColor(provider.type || 'hospital')}
+                  name={provider.name}
+                  status={provider.status === 'approved' ? 'Active permission' : 
+                         provider.status === 'pending' ? 'Pending request' : 'Inactive'}
+                  daysLeft={provider.daysLeft}
+                  active={provider.active}
+                  isPending={provider.status === 'pending'}
+                  accessTo={Array.isArray(provider.accessTo) ? provider.accessTo : []}
+                  onToggle={(active) => toggleAccess.mutate({ id: provider.id.toString(), active })}
+                  onReview={() => {}}
+                  isBlockchainVerified={Boolean(provider.blockchainHash)}
+                />
+              ))}
             </>
+          ) : (
+            <div className="p-6 text-center bg-neutral-50 rounded-lg border border-dashed border-neutral-200">
+              <RiShieldKeyholeLine className="mx-auto h-12 w-12 text-neutral-300" />
+              <h3 className="mt-2 text-sm font-semibold text-neutral-900">No active permissions</h3>
+              <p className="mt-1 text-sm text-neutral-500">You haven't granted any data access permissions yet.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                <RiAddLine className="mr-2 h-4 w-4" />
+                Grant Access
+              </Button>
+            </div>
           )}
         </div>
         
