@@ -3,6 +3,7 @@ import StatsCard from "@/components/dashboard/StatsCard";
 import AIConsultation from "@/components/dashboard/AIConsultation";
 import MedicalActivity from "@/components/dashboard/MedicalActivity";
 import BlockchainVerification from "@/components/dashboard/BlockchainVerification";
+import BlockchainIdentity from "@/components/dashboard/BlockchainIdentity";
 import HealthProfile from "@/components/dashboard/HealthProfile";
 import DataAccessControl from "@/components/dashboard/DataAccessControl";
 import UpcomingAppointments from "@/components/dashboard/UpcomingAppointments";
@@ -65,8 +66,11 @@ export default function Dashboard() {
         {/* Left column (2/3 width) */}
         <div className="lg:col-span-2 space-y-6">
           <AIConsultation />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BlockchainIdentity />
+            <BlockchainVerification />
+          </div>
           <MedicalActivity />
-          <BlockchainVerification />
         </div>
         
         {/* Right column (1/3 width) */}

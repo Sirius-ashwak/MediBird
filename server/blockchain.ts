@@ -4,10 +4,11 @@
  */
 
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { cryptoWaitReady, mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto';
+import { cryptoWaitReady, mnemonicGenerate, mnemonicToMiniSecret, signatureVerify } from '@polkadot/util-crypto';
 import { u8aToHex, hexToU8a, stringToU8a } from '@polkadot/util';
 import { createHash } from "crypto";
 import { smartContracts } from './smartContracts';
+import { signData } from './crypto';
 
 // Initialize Polkadot connection - use a public Westend endpoint (Polkadot testnet)
 let apiInstance: ApiPromise | null = null;
@@ -79,14 +80,35 @@ interface BlockchainRecord {
   title: string;
   userId: number;
   timestamp: string;
+  dataHash: string;         // Hash of the actual data for verification
+  signature?: string;       // Cryptographic signature by the owner
+  encryptionDetails?: {     // Details for encrypted records
+    isEncrypted: boolean;
+    recipientIds?: number[];// IDs of recipients who can access the encrypted data
+  };
+  verifiableCredential?: {  // Verifiable credential for cross-provider identity
+    issuer: string;
+    schema: string;
+    proofs: string[];
+  };
 }
 
 interface BlockchainConsent {
   userId: number;
   providerId: number;
-  dataType: string;
+  dataType: string[];       // Multiple data types that can be accessed
   status: string;
   timestamp: string;
+  expiryDate: string;       // When this consent expires
+  accessConditions: {       // Specific conditions for access
+    purpose: string;
+    accessCount?: number;   // How many times data can be accessed
+    ipRestrictions?: string[]; // IP restrictions if any
+  };
+  cryptographicProof: {     // Cryptographic proof of consent
+    signature: string;      // Patient's signature
+    publicKey: string;      // Patient's public key for verification
+  };
 }
 
 interface BlockchainConsentUpdate {
@@ -94,6 +116,14 @@ interface BlockchainConsentUpdate {
   status: string;
   userId: number;
   timestamp: string;
+  reason: string;           // Reason for update
+  signature: string;        // Signature of the person updating consent
+}
+
+interface ZkProof {
+  proof: string;            // The zero-knowledge proof
+  publicInputs: string[];   // Public inputs for verification
+  verificationKey: string;  // Key for verification
 }
 
 // Interface for application-specific metadata to store on-chain
@@ -117,11 +147,17 @@ class BlockchainService {
   private records: Map<string, BlockchainRecord>;
   private consents: Map<string, BlockchainConsent>;
   private keyring: Keyring | null = null;
+  private userIdentities: Map<number, { 
+    walletAddress: string; 
+    credentials: Map<string, any>;
+    verifiedCredentials: Map<string, any>;
+  }>;
   
   constructor() {
     this.wallets = new Map();
     this.records = new Map();
     this.consents = new Map();
+    this.userIdentities = new Map();
     
     // Initialize cryptography for Polkadot
     this.initCrypto();
@@ -360,13 +396,17 @@ class BlockchainService {
         dataHash,
         timestamp: Date.now(),
         userId: consent.userId,
-        details: `Provider:${consent.providerId},Access:${consent.dataType},Status:${consent.status}`
+        details: `Provider:${consent.providerId},Access:${consent.dataType.join(',')},Status:${consent.status}`
       };
       
       console.log('Creating consent smart contract...');
       
-      // Default consent duration - 30 days
-      const consentDuration = 30;
+      // Parse duration from expiryDate or use default 30 days
+      const expiryDate = new Date(consent.expiryDate || '');
+      const now = new Date();
+      const consentDuration = expiryDate && expiryDate > now 
+        ? Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) 
+        : 30;
       
       // Create the consent smart contract
       const contractId = await smartContracts.createConsentContract(
@@ -374,7 +414,7 @@ class BlockchainService {
         this.keyring,
         consent.userId,
         consent.providerId,
-        [consent.dataType],
+        consent.dataType, // Pass the array of data types
         consentDuration
       );
       
@@ -399,7 +439,7 @@ class BlockchainService {
         null,
         consent.userId,
         consent.providerId,
-        [consent.dataType],
+        Array.isArray(consent.dataType) ? consent.dataType : ["all"], // Ensure it's an array with safe fallback
         30 // 30 days default duration
       );
       
@@ -626,6 +666,237 @@ class BlockchainService {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return result;
+  }
+  
+  /**
+   * Creates a verifiable credential for cross-provider identity
+   * @param userId - The user's ID
+   * @param credentialType - The type of credential (e.g., "medicalLicense", "patientIdentity")
+   * @param data - The credential data
+   * @returns The credential ID
+   */
+  async createVerifiableCredential(
+    userId: number, 
+    credentialType: string, 
+    data: any
+  ): Promise<string> {
+    try {
+      // Check if user already has an identity
+      if (!this.userIdentities.has(userId)) {
+        // Create a wallet if user doesn't have one
+        const walletAddress = await this.createWallet();
+        
+        // Initialize user identity
+        this.userIdentities.set(userId, {
+          walletAddress,
+          credentials: new Map(),
+          verifiedCredentials: new Map()
+        });
+      }
+      
+      const userIdentity = this.userIdentities.get(userId)!;
+      
+      // Create a hash of the credential data for integrity
+      const dataString = JSON.stringify(data);
+      const dataHash = createHash('sha256').update(dataString).digest('hex');
+      
+      // Get the wallet info for this user
+      const walletInfo = this.wallets.get(userIdentity.walletAddress);
+      if (!walletInfo) {
+        throw new Error('Wallet not found for user');
+      }
+      
+      // Sign the credential using the user's private key
+      const signature = signData(dataHash, walletInfo.privateKey);
+      
+      // Create the verifiable credential
+      const credential = {
+        id: `vc-${userId}-${credentialType}-${this.generateRandomHex(8)}`,
+        type: credentialType,
+        issuer: 'MediBridge',
+        subject: userId,
+        issuanceDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
+        claims: data,
+        proof: {
+          type: 'Sr25519Signature2023',
+          created: new Date().toISOString(),
+          verificationMethod: walletInfo.publicKey,
+          proofPurpose: 'assertionMethod',
+          proofValue: signature
+        }
+      };
+      
+      // Store the credential
+      userIdentity.credentials.set(credential.id, credential);
+      
+      return credential.id;
+    } catch (error) {
+      console.error('Error creating verifiable credential:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Verifies a credential using cryptographic proof
+   * @param credentialId - The credential ID
+   * @param userId - The user's ID
+   * @returns True if the credential is valid
+   */
+  verifyCredential(credentialId: string, userId: number): boolean {
+    try {
+      const userIdentity = this.userIdentities.get(userId);
+      if (!userIdentity) {
+        return false;
+      }
+      
+      const credential = userIdentity.credentials.get(credentialId);
+      if (!credential) {
+        return false;
+      }
+      
+      // Verify the credential's signature
+      const dataHash = createHash('sha256').update(JSON.stringify(credential.claims)).digest('hex');
+      
+      // Use the signature verification from Polkadot
+      const { isValid } = signatureVerify(
+        dataHash,
+        credential.proof.proofValue,
+        credential.proof.verificationMethod
+      );
+      
+      return isValid;
+    } catch (error) {
+      console.error('Error verifying credential:', error);
+      return false;
+    }
+  }
+  
+  /**
+   * Grants selective data access to a provider
+   * @param userId - The patient's ID
+   * @param providerId - The provider's ID
+   * @param dataTypes - Types of data to grant access to
+   * @param duration - Duration of access in days
+   * @returns The consent ID
+   */
+  async grantSelectiveAccess(
+    userId: number,
+    providerId: number,
+    dataTypes: string[],
+    duration: number
+  ): Promise<string> {
+    try {
+      // Get the user's wallet
+      if (!this.userIdentities.has(userId)) {
+        throw new Error('User does not have a blockchain identity');
+      }
+      
+      const userIdentity = this.userIdentities.get(userId)!;
+      const walletInfo = this.wallets.get(userIdentity.walletAddress);
+      
+      if (!walletInfo) {
+        throw new Error('Wallet not found for user');
+      }
+      
+      // Create an expiry date
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + duration);
+      
+      // Create a signature for the consent
+      const consentData = {
+        userId,
+        providerId,
+        dataTypes,
+        timestamp: new Date().toISOString(),
+        expiryDate: expiryDate.toISOString()
+      };
+      
+      const signature = signData(JSON.stringify(consentData), walletInfo.privateKey);
+      
+      // Create the blockchain consent
+      const consent: BlockchainConsent = {
+        userId,
+        providerId,
+        dataType: dataTypes,
+        status: 'granted',
+        timestamp: new Date().toISOString(),
+        expiryDate: expiryDate.toISOString(),
+        accessConditions: {
+          purpose: 'medical',
+          accessCount: 10
+        },
+        cryptographicProof: {
+          signature,
+          publicKey: walletInfo.publicKey
+        }
+      };
+      
+      // Store the consent on the blockchain
+      return await this.storeConsent(consent);
+    } catch (error) {
+      console.error('Error granting selective access:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Verifies if a provider has access to a specific data type for a patient
+   * @param patientId - The patient's ID
+   * @param providerId - The provider's ID
+   * @param dataType - The type of data to check access for
+   * @returns True if the provider has access
+   */
+  verifyProviderAccess(patientId: number, providerId: number, dataType: string): boolean {
+    try {
+      let hasAccess = false;
+      
+      // Check all consents for this patient-provider pair
+      Array.from(this.consents.entries()).forEach(([_, consent]) => {
+        if (
+          consent.userId === patientId &&
+          consent.providerId === providerId &&
+          consent.status === 'granted'
+        ) {
+          // Check if the consent covers this data type
+          const dataTypes = Array.isArray(consent.dataType) ? consent.dataType : ['all'];
+          
+          if (dataTypes.includes(dataType) || dataTypes.includes('all')) {
+            // Check if the consent is still valid (not expired)
+            const now = new Date();
+            const expiryDate = new Date(consent.expiryDate);
+            
+            if (now <= expiryDate) {
+              // Check if the signature is valid
+              const consentData = {
+                userId: consent.userId,
+                providerId: consent.providerId,
+                dataTypes,
+                timestamp: consent.timestamp,
+                expiryDate: consent.expiryDate
+              };
+              
+              // Verify the consent signature using Polkadot signature verification
+              const { isValid } = signatureVerify(
+                JSON.stringify(consentData),
+                consent.cryptographicProof.signature,
+                consent.cryptographicProof.publicKey
+              );
+              const isSignatureValid = isValid;
+              
+              if (isSignatureValid) {
+                hasAccess = true;
+              }
+            }
+          }
+        }
+      });
+      
+      return hasAccess;
+    } catch (error) {
+      console.error('Error verifying provider access:', error);
+      return false;
+    }
   }
 }
 

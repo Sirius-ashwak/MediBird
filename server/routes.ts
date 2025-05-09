@@ -11,6 +11,8 @@ import MemoryStore from "memorystore";
 import { z } from "zod";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { createHash } from "crypto";
+import { signData } from "./crypto";
 import {
   insertUserSchema,
   insertMedicalRecordSchema,
@@ -251,6 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: data.title,
         userId: req.user.id,
         timestamp: new Date().toISOString(),
+        dataHash: createHash('sha256').update(JSON.stringify(data)).digest('hex'),
       });
 
       // Store record in database
@@ -324,9 +327,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hash = await blockchain.storeConsent({
         userId: req.user.id,
         providerId: data.providerId,
-        dataType: data.dataType,
+        dataType: Array.isArray(data.dataType) ? data.dataType : [data.dataType],
         status: data.status,
         timestamp: new Date().toISOString(),
+        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+        accessConditions: {
+          purpose: "medical_treatment"
+        },
+        cryptographicProof: {
+          signature: signData(JSON.stringify({
+            userId: req.user.id,
+            providerId: data.providerId,
+            dataType: data.dataType,
+            timestamp: new Date().toISOString()
+          }), "user_private_key"), // In real app, use user's private key
+          publicKey: "user_public_key" // In real app, use user's public key
+        }
       });
 
       // Store consent in database
@@ -361,6 +377,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: req.body.status || (req.body.active ? "approved" : "rejected"),
         userId: req.user.id,
         timestamp: new Date().toISOString(),
+        reason: req.body.reason || "User update via dashboard",
+        signature: signData(JSON.stringify({
+          consentId: id,
+          status: req.body.status || (req.body.active ? "approved" : "rejected"),
+          userId: req.user.id,
+          timestamp: new Date().toISOString()
+        }), "user_private_key") // In real app, use user's private key
       });
 
       // Update consent in database
@@ -635,7 +658,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: record.type,
         title: record.title,
         userId: record.userId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        dataHash: createHash('sha256').update(JSON.stringify(record)).digest('hex')
       };
       
       // Store record on blockchain
@@ -699,9 +723,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const blockchainConsent = {
         userId: consent.userId,
         providerId: consent.providerId,
-        dataType: consent.dataType,
+        dataType: Array.isArray(consent.dataType) ? consent.dataType : [consent.dataType],
         status: consent.status,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+        accessConditions: {
+          purpose: "medical_treatment"
+        },
+        cryptographicProof: {
+          signature: signData(JSON.stringify({
+            userId: consent.userId,
+            providerId: consent.providerId,
+            dataType: consent.dataType,
+            timestamp: new Date().toISOString()
+          }), "user_private_key"), // In real app, use user's private key
+          publicKey: "user_public_key" // In real app, use user's public key
+        }
       };
       
       // Store consent on blockchain
@@ -779,6 +816,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (err) {
       console.error("Error verifying record:", err);
       res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // ======== Advanced Blockchain Identity & Access Control Routes ========
+
+  // Create verifiable credential for cross-provider identity
+  app.post("/api/blockchain/identity/credential", requireAuth, async (req: any, res) => {
+    try {
+      const { credentialType, data } = req.body;
+      
+      if (!credentialType) {
+        return res.status(400).json({ message: "Credential type is required" });
+      }
+      
+      const credentialId = await blockchain.createVerifiableCredential(
+        req.user.id,
+        credentialType,
+        data || { userId: req.user.id, name: req.user.name }
+      );
+      
+      // Log activity
+      await storage.createActivity({
+        userId: req.user.id,
+        type: "credential_created",
+        title: "Identity Credential Created",
+        description: `Created ${credentialType} verifiable credential`,
+        metadata: { credentialId }
+      });
+      
+      // Log in blockchain logs
+      await storage.createBlockchainLog({
+        userId: req.user.id,
+        operation: "CREATE_CREDENTIAL",
+        transactionHash: credentialId,
+        details: `Created ${credentialType} verifiable credential`,
+        status: "completed"
+      });
+      
+      res.json({
+        credentialId,
+        type: credentialType,
+        created: true,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Error creating verifiable credential:", err);
+      res.status(500).json({ message: "Failed to create verifiable credential" });
+    }
+  });
+  
+  // Verify a credential
+  app.post("/api/blockchain/identity/verify", requireAuth, async (req: any, res) => {
+    try {
+      const { credentialId } = req.body;
+      
+      if (!credentialId) {
+        return res.status(400).json({ message: "Credential ID is required" });
+      }
+      
+      const isValid = blockchain.verifyCredential(credentialId, req.user.id);
+      
+      res.json({
+        verified: isValid,
+        credentialId,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Error verifying credential:", err);
+      res.status(500).json({ message: "Failed to verify credential" });
+    }
+  });
+  
+  // Grant selective data access to a provider
+  app.post("/api/blockchain/access/grant", requireAuth, async (req: any, res) => {
+    try {
+      const { providerId, dataTypes, duration } = req.body;
+      
+      if (!providerId) {
+        return res.status(400).json({ message: "Provider ID is required" });
+      }
+      
+      if (!dataTypes || !Array.isArray(dataTypes) || dataTypes.length === 0) {
+        return res.status(400).json({ message: "Data types are required" });
+      }
+      
+      // Default access duration: 30 days
+      const accessDuration = duration || 30;
+      
+      const consentId = await blockchain.grantSelectiveAccess(
+        req.user.id,
+        providerId,
+        dataTypes,
+        accessDuration
+      );
+      
+      // Log activity
+      await storage.createActivity({
+        userId: req.user.id,
+        type: "selective_access_granted",
+        title: "Provider Access Granted",
+        description: `Granted access to ${dataTypes.join(', ')} for ${accessDuration} days`,
+        metadata: { providerId, dataTypes, duration: accessDuration }
+      });
+      
+      // Log in blockchain logs
+      await storage.createBlockchainLog({
+        userId: req.user.id,
+        operation: "GRANT_ACCESS",
+        transactionHash: consentId,
+        details: `Granted selective access to provider ${providerId}`,
+        status: "completed"
+      });
+      
+      res.json({
+        consentId,
+        providerId,
+        dataTypes,
+        duration: accessDuration,
+        expiryDate: new Date(Date.now() + accessDuration * 24 * 60 * 60 * 1000).toISOString(),
+        created: true,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Error granting selective access:", err);
+      res.status(500).json({ message: "Failed to grant selective access" });
+    }
+  });
+  
+  // Verify provider access to data
+  app.post("/api/blockchain/access/verify", requireAuth, async (req: any, res) => {
+    try {
+      const { patientId, dataType } = req.body;
+      
+      if (!patientId) {
+        return res.status(400).json({ message: "Patient ID is required" });
+      }
+      
+      if (!dataType) {
+        return res.status(400).json({ message: "Data type is required" });
+      }
+      
+      const hasAccess = blockchain.verifyProviderAccess(
+        patientId,
+        req.user.id, // Current user is the provider
+        dataType
+      );
+      
+      res.json({
+        hasAccess,
+        patientId,
+        dataType,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Error verifying provider access:", err);
+      res.status(500).json({ message: "Failed to verify provider access" });
     }
   });
 
