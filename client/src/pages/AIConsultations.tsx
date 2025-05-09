@@ -166,27 +166,27 @@ export default function AIConsultations() {
                         key={consultation.id}
                         className={`p-3 rounded-lg cursor-pointer ${
                           activeConsultation === consultation.id.toString() 
-                            ? "bg-primary-50 border border-primary-100" 
-                            : "bg-neutral-50 border border-neutral-200 hover:bg-neutral-100"
+                            ? "bg-primary-50 dark:bg-blue-900/30 border border-primary-100 dark:border-blue-800/50" 
+                            : "bg-neutral-50 dark:bg-slate-800/50 border border-neutral-200 dark:border-slate-700 hover:bg-neutral-100 dark:hover:bg-slate-700/50"
                         }`}
                         onClick={() => setActiveConsultation(consultation.id.toString())}
                       >
                         <div className="flex justify-between items-start">
-                          <h4 className="font-medium text-sm">{consultation.title}</h4>
+                          <h4 className="font-medium text-sm dark:text-white">{consultation.title}</h4>
                           <Badge 
                             variant="outline" 
                             className={consultation.status === "active" 
-                              ? "bg-green-50 text-green-700 text-xs" 
-                              : "bg-neutral-100 text-neutral-700 text-xs"
+                              ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs dark:border-green-800/50" 
+                              : "bg-neutral-100 dark:bg-slate-700 text-neutral-700 dark:text-gray-400 text-xs dark:border-slate-600"
                             }
                           >
                             {consultation.status === "active" ? "Active" : "Completed"}
                           </Badge>
                         </div>
-                        <p className="text-xs text-neutral-500 mt-1">
+                        <p className="text-xs text-neutral-500 dark:text-gray-400 mt-1">
                           {consultation.createdAt ? new Date(consultation.createdAt).toLocaleDateString() : 'Unknown date'}
                         </p>
-                        <p className="text-xs text-neutral-600 mt-2 truncate">
+                        <p className="text-xs text-neutral-600 dark:text-gray-300 mt-2 truncate">
                           {consultation.title}
                         </p>
                       </div>
@@ -194,9 +194,9 @@ export default function AIConsultations() {
                   </div>
                 ) : (
                   <div className="text-center py-6">
-                    <p className="text-neutral-500">No consultations yet</p>
+                    <p className="text-neutral-500 dark:text-gray-400">No consultations yet</p>
                     <Button 
-                      className="mt-2"
+                      className="mt-2 dark:bg-blue-700 dark:hover:bg-blue-600"
                       onClick={() => {
                         // Create a new consultation via API
                         fetch("/api/ai/consultations", {
