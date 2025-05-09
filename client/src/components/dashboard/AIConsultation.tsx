@@ -418,11 +418,29 @@ export default function AIConsultation() {
               transition={{ delay: 0.3, duration: 0.3 }}
             >
               <form onSubmit={handleSendMessage} className="flex flex-col space-y-3">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 relative">
                   <motion.div 
-                    className="flex-1" 
-                    whileTap={{ scale: 0.99 }}
+                    className="flex-1 relative"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 25,
+                      delay: 0.1
+                    }}
                   >
+                    {/* Animated focus ring */}
+                    <motion.div 
+                      className="absolute inset-0 rounded-full"
+                      animate={{ 
+                        boxShadow: input.length > 0 
+                          ? "0 0 0 2px rgba(99, 102, 241, 0.3), 0 2px 8px rgba(99, 102, 241, 0.2)" 
+                          : "0 0 0 0 rgba(99, 102, 241, 0)"
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    
                     <Input 
                       type="text" 
                       value={input}
@@ -430,44 +448,131 @@ export default function AIConsultation() {
                       className="flex-1 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200" 
                       placeholder="Type your health concern..." 
                     />
+                    
+                    {/* Animated placeholder/hint text that appears when input is empty and not focused */}
+                    {!input && (
+                      <motion.div 
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-slate-400 dark:text-slate-500 flex items-center pointer-events-none"
+                        initial={{ opacity: 0 }}
+                        animate={{ 
+                          opacity: [0, 0.7, 0], 
+                          x: [0, 3, 0]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity,
+                          repeatDelay: 3
+                        }}
+                      >
+                        Ask anything...
+                      </motion.div>
+                    )}
                   </motion.div>
+                  
                   <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ type: "spring", stiffness: 400 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 25,
+                      delay: 0.2
+                    }}
+                    whileHover={{ 
+                      scale: 1.05,
+                      rotate: 5 
+                    }}
+                    whileTap={{ 
+                      scale: 0.95,
+                      rotate: 0 
+                    }}
                   >
                     <Button 
                       type="submit"
                       disabled={sendMessage.isPending || !input.trim()}
-                      className="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-2.5 rounded-full hover:from-primary-600 hover:to-primary-700 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:shadow-none"
+                      className="relative overflow-hidden bg-gradient-to-r from-primary-500 to-primary-600 text-white p-2.5 rounded-full hover:from-primary-600 hover:to-primary-700 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:shadow-none"
                     >
-                      <SendIcon className="h-4 w-4" />
+                      {/* Button ripple animation */}
+                      {!sendMessage.isPending && input.trim() && (
+                        <motion.div
+                          className="absolute inset-0 bg-white"
+                          initial={{ scale: 0, opacity: 0.5, x: "-50%", y: "-50%" }}
+                          animate={{ scale: 0 }}
+                          whileTap={{ scale: 4, opacity: 0 }}
+                          transition={{ duration: 0.8 }}
+                          style={{ borderRadius: "100%", left: "50%", top: "50%", originX: "50%", originY: "50%" }}
+                        />
+                      )}
+                      
+                      {/* Send icon with animation */}
+                      <motion.div
+                        animate={sendMessage.isPending ? { rotate: 360 } : { x: [0, 2, 0] }}
+                        transition={sendMessage.isPending ? 
+                          { repeat: Infinity, duration: 1, ease: "linear" } : 
+                          { repeat: Infinity, repeatDelay: 2, duration: 0.5 }
+                        }
+                      >
+                        <SendIcon className="h-4 w-4" />
+                      </motion.div>
                     </Button>
                   </motion.div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2">
-                  {quickPhrases.map((phrase, index) => (
-                    <motion.div
-                      key={phrase.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 + (index * 0.05) }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setInput(phrase.text)}
-                        className="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full text-xs hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 shadow-sm"
+                <AnimatePresence>
+                  <motion.div 
+                    className="flex flex-wrap gap-2"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ 
+                      opacity: 1, 
+                      height: "auto",
+                      transition: {
+                        height: { duration: 0.3 },
+                        opacity: { duration: 0.3, delay: 0.1 }
+                      }
+                    }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    {quickPhrases.map((phrase, index) => (
+                      <motion.div
+                        key={phrase.id}
+                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ 
+                          delay: 0.3 + (index * 0.08),
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 25
+                        }}
+                        whileHover={{ 
+                          scale: 1.05, 
+                          y: -2,
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
+                        }}
+                        whileTap={{ scale: 0.95, y: 0 }}
                       >
-                        {phrase.text}
-                      </Button>
-                    </motion.div>
-                  ))}
-                </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setInput(phrase.text)}
+                          className="relative overflow-hidden bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full text-xs hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 shadow-sm"
+                        >
+                          {/* Button glow effect on hover */}
+                          <motion.div 
+                            className="absolute inset-0 bg-primary-100 dark:bg-primary-900/30 rounded-full"
+                            initial={{ opacity: 0 }}
+                            whileHover={{ opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                          />
+                          
+                          <motion.span className="relative z-10">
+                            {phrase.text}
+                          </motion.span>
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
               </form>
             </motion.div>
           </div>

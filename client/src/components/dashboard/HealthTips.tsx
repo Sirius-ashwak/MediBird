@@ -273,97 +273,258 @@ const HealthTips: React.FC<HealthTipsProps> = ({
     return 'bg-gradient-to-r from-blue-50 to-blue-100';
   };
   
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className={`${getHeaderClass()} py-3`}>
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            {currentTip?.category.icon}
-            <span>{currentTip?.category.name || 'Health'} Tips</span>
-          </CardTitle>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="px-2 h-8"
-            onClick={() => showNewTip()}
-          >
-            <ArrowRight className="h-4 w-4 mr-1" />
-            <span className="text-xs">Next Tip</span>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="p-4">
-        <div className="flex items-start gap-4">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={tipCount}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <TipCharacter emotion={getCharacterEmotion()} />
-            </motion.div>
-          </AnimatePresence>
-          
-          <div className="flex-1">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={tipCount}
-                className="text-sm text-gray-700"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+    >
+      <Card className="overflow-hidden border-slate-200 dark:border-slate-700 shadow-md">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <CardHeader className={`${getHeaderClass()} py-3 relative overflow-hidden`}>
+            {/* Animated background pattern */}
+            <motion.div 
+              className="absolute inset-0 opacity-5"
+              style={{ 
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='2'/%3E%3Ccircle cx='13' cy='13' r='2'/%3E%3C/g%3E%3C/svg%3E")` 
+              }}
+              animate={isHovered ? { 
+                backgroundPositionX: ["0px", "10px"],
+                backgroundPositionY: ["0px", "10px"]
+              } : {}}
+              transition={isHovered ? { 
+                duration: 3, 
+                repeat: Infinity, 
+                repeatType: "loop" 
+              } : {}}
+            />
+            
+            <div className="flex justify-between items-center relative z-10">
+              <motion.div
+                animate={isHovered ? { x: 3 } : { x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                {currentTip?.tip || "Click 'Next Tip' to see a health recommendation tailored for you."}
-              </motion.p>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <motion.div
+                    animate={isHovered ? { 
+                      rotate: [0, 5, 0, -5, 0],
+                      scale: [1, 1.1, 1]
+                    } : {}}
+                    transition={isHovered ? { 
+                      duration: 1.5,
+                      repeat: 1,
+                      repeatType: "reverse"
+                    } : {}}
+                  >
+                    {currentTip?.category.icon}
+                  </motion.div>
+                  <motion.span
+                    animate={isHovered ? { 
+                      color: currentTip?.category.color === 'green' ? "#16a34a" :
+                             currentTip?.category.color === 'blue' ? "#2563eb" :
+                             currentTip?.category.color === 'purple' ? "#9333ea" :
+                             "#d97706"
+                    } : {}}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {currentTip?.category.name || 'Health'} Tips
+                  </motion.span>
+                </CardTitle>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="px-2 h-8 relative overflow-hidden group"
+                  onClick={() => showNewTip()}
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-slate-100 dark:bg-slate-700 rounded opacity-0 group-hover:opacity-100"
+                    initial={{ scale: 0, x: "-50%", y: "-50%" }}
+                    whileHover={{ scale: 2 }}
+                    transition={{ duration: 0.4 }}
+                    style={{ left: "50%", top: "50%", originX: "50%", originY: "50%" }}
+                  />
+                  <motion.div 
+                    className="mr-1 relative z-10"
+                    animate={isHovered ? { x: [0, 4, 0] } : {}}
+                    transition={{ 
+                      duration: 1.5, 
+                      repeat: isHovered ? Infinity : 0, 
+                      repeatType: "reverse",
+                      repeatDelay: 1
+                    }}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.div>
+                  <span className="text-xs relative z-10">Next Tip</span>
+                </Button>
+              </motion.div>
+            </div>
+          </CardHeader>
+        </motion.div>
+        
+        <CardContent className="p-4">
+          <div className="flex items-start gap-4">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tipCount}
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 30
+                }}
+              >
+                <TipCharacter emotion={getCharacterEmotion()} />
+              </motion.div>
             </AnimatePresence>
             
-            {currentTip && (
-              <motion.div 
-                className="mt-3 flex gap-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
+            <div className="flex-1">
+              <AnimatePresence mode="wait">
                 <motion.div
-                  whileHover={!reaction ? { scale: 1.05 } : {}}
-                  whileTap={!reaction ? { scale: 0.95 } : {}}
+                  key={tipCount}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                    delay: 0.1
+                  }}
                 >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleReaction(true)}
-                    className={`text-xs ${reaction === 'liked' ? 'bg-green-50 border-green-200 text-green-700' : ''}`}
-                    disabled={!!reaction}
+                  <motion.p
+                    className="text-sm text-gray-700 dark:text-gray-300"
+                    animate={{ 
+                      scale: isHovered ? 1.01 : 1,
+                    }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <ThumbsUp className={`h-3 w-3 mr-1 ${reaction === 'liked' ? 'text-green-600' : ''}`} />
-                    Helpful
-                  </Button>
+                    {currentTip?.tip || "Click 'Next Tip' to see a health recommendation tailored for you."}
+                  </motion.p>
+                  
+                  {/* Text highlight animation for emphasis */}
+                  {isHovered && currentTip?.tip && (
+                    <motion.div
+                      className="w-full h-2 mt-0.5 bg-gradient-to-r from-transparent via-primary-100 to-transparent"
+                      initial={{ scaleX: 0, opacity: 0 }}
+                      animate={{ scaleX: 1, opacity: 0.6 }}
+                      transition={{ duration: 1 }}
+                    />
+                  )}
                 </motion.div>
-                
-                <motion.div
-                  whileHover={!reaction ? { scale: 1.05 } : {}}
-                  whileTap={!reaction ? { scale: 0.95 } : {}}
+              </AnimatePresence>
+              
+              {currentTip && (
+                <motion.div 
+                  className="mt-3 flex gap-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    delay: 0.3,
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 30
+                  }}
                 >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleReaction(false)}
-                    className={`text-xs ${reaction === 'disliked' ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
-                    disabled={!!reaction}
+                  <motion.div
+                    whileHover={!reaction ? { 
+                      scale: 1.05,
+                      y: -2
+                    } : {}}
+                    whileTap={!reaction ? { scale: 0.95 } : {}}
                   >
-                    <ThumbsDown className={`h-3 w-3 mr-1 ${reaction === 'disliked' ? 'text-blue-600' : ''}`} />
-                    Not for me
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleReaction(true)}
+                      className={`text-xs relative overflow-hidden ${reaction === 'liked' ? 'bg-green-50 border-green-200 text-green-700' : ''}`}
+                      disabled={!!reaction}
+                    >
+                      {reaction === 'liked' && (
+                        <motion.div
+                          className="absolute inset-0 bg-green-100"
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      )}
+                      <motion.div 
+                        className="relative z-10 flex items-center"
+                        animate={reaction === 'liked' ? { 
+                          y: [0, -3, 0],
+                          x: [0, 2, 0, -2, 0]
+                        } : {}}
+                        transition={{ 
+                          duration: 0.5,
+                          repeat: reaction === 'liked' ? 1 : 0
+                        }}
+                      >
+                        <ThumbsUp className={`h-3 w-3 mr-1 ${reaction === 'liked' ? 'text-green-600' : ''}`} />
+                        <span>Helpful</span>
+                      </motion.div>
+                    </Button>
+                  </motion.div>
+                  
+                  <motion.div
+                    whileHover={!reaction ? { 
+                      scale: 1.05,
+                      y: -2
+                    } : {}}
+                    whileTap={!reaction ? { scale: 0.95 } : {}}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleReaction(false)}
+                      className={`text-xs relative overflow-hidden ${reaction === 'disliked' ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
+                      disabled={!!reaction}
+                    >
+                      {reaction === 'disliked' && (
+                        <motion.div
+                          className="absolute inset-0 bg-blue-100"
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      )}
+                      <motion.div 
+                        className="relative z-10 flex items-center"
+                        animate={reaction === 'disliked' ? { 
+                          y: [0, -3, 0],
+                          rotate: [0, -5, 0]
+                        } : {}}
+                        transition={{ 
+                          duration: 0.5,
+                          repeat: reaction === 'disliked' ? 1 : 0
+                        }}
+                      >
+                        <ThumbsDown className={`h-3 w-3 mr-1 ${reaction === 'disliked' ? 'text-blue-600' : ''}`} />
+                        <span>Not for me</span>
+                      </motion.div>
+                    </Button>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
